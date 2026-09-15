@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browse Tech & Design Jobs — JobPortal{% endblock %}
+
+{% block content %}
+
+<div class="bg-white border-bottom py-4 mb-4">
+  <div class="container">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+      <div>
+        <h3 class="fw-bold text-dark mb-1">Browse Jobs</h3>
+        <p class="text-muted small mb-0">Search and filter open roles across engineering, design, and product disciplines.</p>
+      </div>
+      <div>
+        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fs-6">
+          <span id="total-jobs-count" class="text-primary fw-bold">{{ total_count }}</span> active listings
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5" id="job-results-top">
+  <div class="row g-4">
+
+    <div class="col-lg-3">
+      <div class="jp-card p-4 sticky-top" style="top: 85px; z-index: 10;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="fw-bold text-dark mb-0"><i class="bi bi-funnel me-1 text-primary"></i> Filter Jobs</h6>
+          <a href="#" id="btn-clear-filters" class="small text-muted text-decoration-none">Reset</a>
+        </div>
+
+        <form id="job-filter-form" action="{% url 'jobs:job_list' %}" method="get">
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Keyword</label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" name="q" value="{{ current_filters.q }}" class="form-control" placeholder="Title, stack, company...">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Location</label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-white"><i class="bi bi-geo-alt text-muted"></i></span>
+              <input type="text" name="location" value="{{ current_filters.location }}" class="form-control" placeholder="City or state...">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Domain / Category</label>
+            <select name="category" id="filter-category" class="form-select form-select-sm">
+              <option value="">All Categories</option>
+              {% for cat in categories %}
+                <option value="{{ cat.slug }}" {% if current_filters.category == cat.slug %}selected{% endif %}>
+                  {{ cat.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Employment Type</label>
+            <select name="job_type" class="form-select form-select-sm">
+              <option value="">All Types</option>
+              {% for val, label in job_types %}
+                <option value="{{ val }}" {% if current_filters.job_type == val %}selected{% endif %}>
+                  {{ label }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Experience Level</label>
+            <select name="experience" class="form-select form-select-sm">
+              <option value="">All Experience Levels</option>
+              {% for val, label in experience_levels %}
+                <option value="{{ val }}" {% if current_filters.experience == val %}selected{% endif %}>
+                  {{ label }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" name="remote" value="1" id="remoteOnlySwitch" {% if current_filters.remote %}checked{% endif %}>
+            <label class="form-check-label small fw-semibold text-dark" for="remoteOnlySwitch">
+              Remote Roles Only
+            </label>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small text-muted">Min Salary ($/yr)</label>
+            <input type="number" name="min_salary" value="{{ current_filters.min_salary }}" class="form-control form-control-sm" placeholder="e.g. 100000" step="10000">
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-9 position-relative">
+
+      <div id="filter-loading-spinner" class="d-none text-center py-2 mb-2">
+        <span class="spinner-border spinner-border-sm text-primary me-2" role="status"></span>
+        <span class="small text-muted">Updating results...</span>
+      </div>
+
+      <div id="job-cards-container" style="transition: opacity 0.2s ease;">
+        {% include 'jobs/_job_cards.html' %}
+      </div>
+
+      <div id="pagination-container">
+        {% include 'jobs/_pagination.html' %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/jobs.js' %}"></script>
+{% endblock %}

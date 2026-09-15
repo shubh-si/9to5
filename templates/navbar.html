@@ -1,0 +1,248 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg jp-navbar sticky-top">
+  <div class="container-fluid px-3 px-md-4 px-xl-5">
+
+    <a class="navbar-brand d-flex align-items-center gap-2 me-3 me-xl-4 text-decoration-none" href="{% url 'home' %}">
+      <img src="{% static 'images/logo.png' %}" alt="9to5" class="brand-logo-img" width="34" height="34">
+      <span class="brand-text">9to5</span>
+    </a>
+
+    <button class="navbar-toggler border-0 shadow-none p-1" type="button" data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+      aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center gap-1 gap-xl-2">
+        <li class="nav-item">
+          <a class="nav-link jp-nav-link {% if 'jobs' in request.path and 'companies' not in request.path and 'categories' not in request.path and 'candidates' not in request.path and 'create' not in request.path %}active{% endif %}"
+            href="{% url 'jobs:job_list' %}">
+            <i class="bi bi-briefcase"></i>
+            <span>Browse Jobs</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link jp-nav-link {% if 'companies' in request.path %}active{% endif %}"
+            href="{% url 'jobs:companies_list' %}">
+            <i class="bi bi-building"></i>
+            <span>Companies</span>
+          </a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link jp-nav-link dropdown-toggle {% if 'resume-builder' in request.path or 'candidate' in request.path or 'pricing' in request.path %}active{% endif %}"
+            href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-grid"></i>
+            <span>Services</span>
+          </a>
+          <ul class="dropdown-menu shadow-lg border-light-subtle rounded-3 p-2 mt-1" style="min-width: 250px;">
+            <li>
+              <a class="dropdown-item py-2 px-3 rounded-2 d-flex align-items-center gap-2" href="{% url 'accounts:resume_builder' %}">
+                <i class="bi bi-magic text-warning fs-5"></i>
+                <div>
+                  <div class="fw-semibold text-dark small">Resume Builder</div>
+                  <div class="text-muted" style="font-size: 0.72rem;">Interactive PDF resume creator</div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item py-2 px-3 rounded-2 d-flex align-items-center gap-2" href="{% url 'jobs:candidate_sourcing' %}">
+                <i class="bi bi-people text-success fs-5"></i>
+                <div>
+                  <div class="fw-semibold text-dark small">Candidate Sourcing</div>
+                  <div class="text-muted" style="font-size: 0.72rem;">Discover verified tech talent</div>
+                </div>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider my-1"></li>
+            <li>
+              <a class="dropdown-item py-2 px-3 rounded-2 d-flex align-items-center gap-2" href="{% url 'pricing' %}">
+                <i class="bi bi-tag text-primary fs-5"></i>
+                <div>
+                  <div class="fw-semibold text-dark small">Pricing & Plans</div>
+                  <div class="text-muted" style="font-size: 0.72rem;">Plans for growing companies</div>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link jp-nav-link dropdown-toggle {% if 'categories' in request.path or 'advice' in request.path or 'about' in request.path or 'faq' in request.path or 'contact' in request.path %}active{% endif %}"
+            href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-compass"></i>
+            <span>Resources</span>
+          </a>
+          <ul class="dropdown-menu shadow-lg border-light-subtle rounded-3 p-2 mt-1" style="min-width: 250px;">
+            <li>
+              <a class="dropdown-item py-2 px-3 rounded-2 d-flex align-items-center gap-2" href="{% url 'jobs:categories_list' %}">
+                <i class="bi bi-folder2-open text-primary fs-5"></i>
+                <div>
+                  <div class="fw-semibold text-dark small">Browse Categories</div>
+                  <div class="text-muted" style="font-size: 0.72rem;">Explore roles by discipline</div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item py-2 px-3 rounded-2 d-flex align-items-center gap-2" href="{% url 'career_advice' %}">
+                <i class="bi bi-mortarboard text-success fs-5"></i>
+                <div>
+                  <div class="fw-semibold text-dark small">Career Guides & Advice</div>
+                  <div class="text-muted" style="font-size: 0.72rem;">Interview tips & growth strategies</div>
+                </div>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider my-1"></li>
+            <li>
+              <a class="dropdown-item py-2 px-3 rounded-2 d-flex align-items-center gap-2" href="{% url 'about' %}">
+                <i class="bi bi-info-circle text-info fs-5"></i>
+                <div>
+                  <div class="fw-semibold text-dark small">About Us</div>
+                  <div class="text-muted" style="font-size: 0.72rem;">Our mission and tech platform</div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item py-2 px-3 rounded-2 d-flex align-items-center gap-2" href="{% url 'faq' %}">
+                <i class="bi bi-question-circle text-secondary fs-5"></i>
+                <div>
+                  <div class="fw-semibold text-dark small">Help & FAQ</div>
+                  <div class="text-muted" style="font-size: 0.72rem;">Frequently asked questions</div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item py-2 px-3 rounded-2 d-flex align-items-center gap-2" href="{% url 'contact' %}">
+                <i class="bi bi-headset text-danger fs-5"></i>
+                <div>
+                  <div class="fw-semibold text-dark small">Contact Support</div>
+                  <div class="text-muted" style="font-size: 0.72rem;">Get in touch with our team</div>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-2 gap-xl-3 pt-2 pt-lg-0">
+        {% if user.is_authenticated %}
+
+        {% if is_employer %}
+        <li class="nav-item">
+          <a href="{% url 'jobs:job_create' %}"
+            class="btn btn-sm btn-primary rounded-pill px-3 py-2 shadow-xs d-inline-flex align-items-center gap-1 fw-semibold">
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>Post a Job</span>
+          </a>
+        </li>
+        {% endif %}
+
+        <li class="nav-item">
+          <a class="btn btn-sm btn-light border rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1 fw-semibold text-secondary hover-dark"
+            href="{% url 'dashboard:redirect_dashboard' %}">
+            <i class="bi bi-speedometer2 text-primary"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-user-pill dropdown-toggle d-flex align-items-center gap-2 text-decoration-none" href="#" role="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="position-relative">
+              {% if user.avatar %}
+              <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="nav-user-avatar">
+              {% else %}
+              <div class="nav-user-avatar bg-primary text-white d-inline-flex align-items-center justify-content-center fw-bold text-uppercase" style="font-size: 0.85rem;">
+                {{ user.username|make_list|first }}
+              </div>
+              {% endif %}
+              <span class="status-dot-online"></span>
+            </div>
+            <span class="fw-bold text-dark small d-none d-sm-inline">{{ user.username }}</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-light-subtle rounded-3 mt-2 p-2"
+            style="min-width: 240px;">
+            <li class="dropdown-header px-3 py-2">
+              <div class="small text-muted">Signed in as</div>
+              <div class="fw-bold text-dark">{{ user.get_role_display }}</div>
+              {% if user.email %}
+              <div class="small text-muted text-truncate">{{ user.email }}</div>
+              {% endif %}
+            </li>
+            <li><hr class="dropdown-divider my-1"></li>
+
+            {% if is_seeker %}
+            <li><a class="dropdown-item py-2 px-3 rounded-2" href="{% url 'accounts:resume_builder' %}"><i
+                  class="bi bi-magic me-2 text-warning"></i>Resume Studio & Builder</a></li>
+            <li><a class="dropdown-item py-2 px-3 rounded-2" href="{% url 'accounts:seeker_profile_edit' %}"><i
+                  class="bi bi-person me-2 text-primary"></i>My Profile & Settings</a></li>
+            <li><a class="dropdown-item py-2 px-3 rounded-2" href="{% url 'dashboard:seeker_dashboard' %}"><i
+                  class="bi bi-file-earmark-check me-2 text-info"></i>My Applications</a></li>
+            <li><a class="dropdown-item py-2 px-3 rounded-2" href="{% url 'career_advice' %}"><i
+                  class="bi bi-mortarboard me-2 text-success"></i>Career Resources</a></li>
+            {% elif is_employer %}
+            <li><a class="dropdown-item py-2 px-3 rounded-2" href="{% url 'accounts:employer_profile_edit' %}"><i
+                  class="bi bi-building me-2 text-primary"></i>Company Profile</a></li>
+            <li><a class="dropdown-item py-2 px-3 rounded-2" href="{% url 'dashboard:employer_dashboard' %}"><i
+                  class="bi bi-list-task me-2 text-info"></i>Manage Job Listings</a></li>
+            <li><a class="dropdown-item py-2 px-3 rounded-2" href="{% url 'jobs:candidate_sourcing' %}"><i
+                  class="bi bi-people me-2 text-success"></i>Source Candidates</a></li>
+            <li><a class="dropdown-item py-2 px-3 rounded-2" href="{% url 'jobs:job_create' %}"><i
+                  class="bi bi-plus-circle me-2 text-warning"></i>Post New Job</a></li>
+            {% endif %}
+
+            {% if is_admin_user %}
+            <li><hr class="dropdown-divider my-1"></li>
+            <li><a class="dropdown-item py-2 px-3 rounded-2" href="{% url 'dashboard:admin_dashboard' %}"><i
+                  class="bi bi-shield-lock me-2 text-primary"></i>Admin Overview</a></li>
+            <li><a class="dropdown-item py-2 px-3 rounded-2" href="/admin/" target="_blank"><i
+                  class="bi bi-gear me-2 text-muted"></i>Django System Admin</a></li>
+            {% endif %}
+
+            <li><hr class="dropdown-divider my-1"></li>
+            <li>
+              <form action="{% url 'accounts:logout' %}" method="post" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item py-2 px-3 rounded-2 text-danger d-flex align-items-center gap-2">
+                  <i class="bi bi-box-arrow-right"></i>
+                  <span>Sign Out</span>
+                </button>
+              </form>
+            </li>
+          </ul>
+        </li>
+
+        {% else %}
+
+        <li class="nav-item">
+          <a class="nav-link jp-nav-link" href="{% url 'accounts:login' %}">Sign In</a>
+        </li>
+        <li class="nav-item dropdown">
+          <button class="btn btn-primary btn-sm rounded-pill px-3 py-2 dropdown-toggle shadow-xs fw-semibold" type="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            Get Started
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-light-subtle rounded-3 p-2 mt-2"
+            style="min-width: 270px;">
+            <li>
+              <a class="dropdown-item py-2 px-3 rounded-2" href="{% url 'accounts:register' %}?role=seeker">
+                <div class="fw-semibold text-dark"><i class="bi bi-person-badge text-primary me-2"></i>Sign up as Job Seeker</div>
+                <div class="small text-muted ps-4">Find jobs, upload resume, track status</div>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider my-1"></li>
+            <li>
+              <a class="dropdown-item py-2 px-3 rounded-2" href="{% url 'accounts:register' %}?role=employer">
+                <div class="fw-semibold text-dark"><i class="bi bi-building text-success me-2"></i>Sign up as Employer</div>
+                <div class="small text-muted ps-4">Post openings and discover verified talent</div>
+              </a>
+            </li>
+          </ul>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>

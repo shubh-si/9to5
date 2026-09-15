@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Job Seeker Dashboard — JobPortal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="jp-card p-4 mb-4 bg-white">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div class="d-flex align-items-center gap-3">
+        {% if user.avatar %}
+          <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="rounded-circle" style="width: 56px; height: 56px; object-fit: cover;">
+        {% else %}
+          <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center fw-bold fs-4" style="width: 56px; height: 56px;">
+            {{ user.username|make_list|first|upper }}
+          </div>
+        {% endif %}
+        <div>
+          <h4 class="fw-bold text-dark mb-0">Hello, {{ user.first_name|default:user.username }}!</h4>
+          <div class="small text-muted">{{ profile.headline|default:"Complete your profile to unlock tailored recommendations" }}</div>
+        </div>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="{% url 'accounts:resume_builder' %}" class="btn btn-primary btn-sm shadow-xs">
+          <i class="bi bi-magic me-1"></i> Resume Builder Studio
+        </a>
+        <a href="{% url 'accounts:seeker_profile_edit' %}" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-pencil-square me-1"></i> Edit Profile
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-4 pt-3 border-top">
+      <div class="d-flex justify-content-between small fw-semibold mb-1">
+        <span>Profile Completeness</span>
+        <span class="text-primary">{{ completion }}%</span>
+      </div>
+      <div class="progress" style="height: 6px;">
+        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ completion }}%;" aria-valuenow="{{ completion }}" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="metric-card cursor-pointer" onclick="$('#applications-tab').tab('show');">
+        <div class="metric-icon indigo">
+          <i class="bi bi-file-earmark-text"></i>
+        </div>
+        <div>
+          <div class="h3 fw-bold text-dark mb-0">{{ app_stats.total }}</div>
+          <div class="text-muted small">Total Applications</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="metric-card cursor-pointer" onclick="$('#applications-tab').tab('show');">
+        <div class="metric-icon amber">
+          <i class="bi bi-star"></i>
+        </div>
+        <div>
+          <div class="h3 fw-bold text-dark mb-0">{{ app_stats.shortlisted }}</div>
+          <div class="text-muted small">Shortlisted</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="metric-card cursor-pointer" onclick="$('#applications-tab').tab('show');">
+        <div class="metric-icon emerald">
+          <i class="bi bi-check2-circle"></i>
+        </div>
+        <div>
+          <div class="h3 fw-bold text-dark mb-0">{{ app_stats.hired }}</div>
+          <div class="text-muted small">Offers / Hired</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="metric-card cursor-pointer" onclick="$('#saved-tab').tab('show');">
+        <div class="metric-icon sky">
+          <i class="bi bi-bookmark"></i>
+        </div>
+        <div>
+          <div class="h3 fw-bold text-dark mb-0">{{ saved_jobs.count }}</div>
+          <div class="text-muted small">Bookmarked Jobs</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="jp-card p-4">
+    <ul class="nav nav-pills mb-4" id="seekerDashboardTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active fw-semibold" id="applications-tab" data-bs-toggle="pill" data-bs-target="#tab-applications" type="button" role="tab">
+          <i class="bi bi-file-earmark-check me-1"></i> Submitted Applications ({{ applications.count }})
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link fw-semibold" id="saved-tab" data-bs-toggle="pill" data-bs-target="#tab-saved" type="button" role="tab">
+          <i class="bi bi-bookmark me-1"></i> Saved Jobs ({{ saved_jobs.count }})
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="seekerDashboardTabContent">
+
+      <div class="tab-pane fade show active" id="tab-applications" role="tabpanel">
+        {% if applications %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light small text-uppercase text-muted">
+                <tr>
+                  <th>Job Title</th>
+                  <th>Company</th>
+                  <th>Applied On</th>
+                  <th>Status</th>
+                  <th class="text-end">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for app in applications %}
+                  <tr>
+                    <td>
+                      <a href="{% url 'jobs:job_detail' slug=app.job.slug %}" class="fw-semibold text-dark text-decoration-none hover-primary">
+                        {{ app.job.title }}
+                      </a>
+                      <div class="small text-muted">{{ app.job.location }}</div>
+                    </td>
+                    <td>
+                      <span class="fw-medium text-dark">{{ app.job.employer.company_name }}</span>
+                    </td>
+                    <td class="small text-muted">
+                      {{ app.created_at|date:"M d, Y" }}
+                    </td>
+                    <td>
+                      <span class="badge {{ app.status_badge_class }} px-2 py-1">
+                        {{ app.get_status_display }}
+                      </span>
+                    </td>
+                    <td class="text-end">
+                      <a href="{% url 'jobs:job_detail' slug=app.job.slug %}" class="btn btn-sm btn-outline-primary">
+                        View Listing
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <i class="bi bi-briefcase text-muted fs-1 mb-2 d-block"></i>
+            <h6 class="fw-bold text-dark">No applications submitted yet</h6>
+            <p class="text-muted small mb-3">Explore open positions and apply directly with your profile resume.</p>
+            <a href="{% url 'jobs:job_list' %}" class="btn btn-primary btn-sm">Browse Available Jobs</a>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="tab-pane fade" id="tab-saved" role="tabpanel">
+        {% if saved_jobs %}
+          <div class="row g-3">
+            {% for saved in saved_jobs %}
+              <div class="col-md-6 col-lg-4">
+                <div class="jp-job-card h-100">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="fw-bold mb-0">
+                      <a href="{% url 'jobs:job_detail' slug=saved.job.slug %}" class="text-decoration-none text-dark hover-primary">
+                        {{ saved.job.title }}
+                      </a>
+                    </h6>
+                    <button class="btn-bookmark saved" data-job-id="{{ saved.job.id }}" title="Remove bookmark">
+                      <i class="bi bi-bookmark-fill text-danger"></i>
+                    </button>
+                  </div>
+                  <div class="small text-muted mb-2">{{ saved.job.employer.company_name }} &bull; {{ saved.job.location }}</div>
+                  <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                    <span class="small fw-bold text-dark">{{ saved.job.salary_display }}</span>
+                    <a href="{% url 'jobs:job_detail' slug=saved.job.slug %}" class="btn btn-sm btn-primary">
+                      Apply
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <i class="bi bi-bookmark text-muted fs-1 mb-2 d-block"></i>
+            <h6 class="fw-bold text-dark">No bookmarked jobs</h6>
+            <p class="text-muted small mb-3">Save jobs you are interested in by clicking the bookmark icon on any job card.</p>
+            <a href="{% url 'jobs:job_list' %}" class="btn btn-outline-primary btn-sm">Explore Jobs</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

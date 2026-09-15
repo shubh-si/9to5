@@ -1,0 +1,259 @@
+import django.contrib.auth.models
+import django.contrib.auth.validators
+import django.db.models.deletion
+import django.utils.timezone
+from django.conf import settings
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+    initial = True
+
+    dependencies = [
+        ("auth", "0012_alter_user_first_name_max_length"),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name="User",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("password", models.CharField(max_length=128, verbose_name="password")),
+                (
+                    "last_login",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="last login"
+                    ),
+                ),
+                (
+                    "is_superuser",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates that this user has all permissions without explicitly assigning them.",
+                        verbose_name="superuser status",
+                    ),
+                ),
+                (
+                    "username",
+                    models.CharField(
+                        error_messages={
+                            "unique": "A user with that username already exists."
+                        },
+                        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
+                        max_length=150,
+                        unique=True,
+                        validators=[
+                            django.contrib.auth.validators.UnicodeUsernameValidator()
+                        ],
+                        verbose_name="username",
+                    ),
+                ),
+                (
+                    "first_name",
+                    models.CharField(
+                        blank=True, max_length=150, verbose_name="first name"
+                    ),
+                ),
+                (
+                    "last_name",
+                    models.CharField(
+                        blank=True, max_length=150, verbose_name="last name"
+                    ),
+                ),
+                (
+                    "is_staff",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates whether the user can log into this admin site.",
+                        verbose_name="staff status",
+                    ),
+                ),
+                (
+                    "is_active",
+                    models.BooleanField(
+                        default=True,
+                        help_text="Designates whether this user should be treated as active. Unselect this instead of deleting accounts.",
+                        verbose_name="active",
+                    ),
+                ),
+                (
+                    "date_joined",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="date joined"
+                    ),
+                ),
+                (
+                    "role",
+                    models.CharField(
+                        choices=[
+                            ("SEEKER", "Job Seeker"),
+                            ("EMPLOYER", "Employer"),
+                            ("ADMIN", "Site Administrator"),
+                        ],
+                        default="SEEKER",
+                        max_length=20,
+                    ),
+                ),
+                ("email", models.EmailField(max_length=254, unique=True)),
+                ("phone", models.CharField(blank=True, max_length=25)),
+                (
+                    "avatar",
+                    models.ImageField(blank=True, null=True, upload_to="avatars/"),
+                ),
+                ("is_verified", models.BooleanField(default=False)),
+                (
+                    "verification_token",
+                    models.CharField(blank=True, default="", max_length=64),
+                ),
+                (
+                    "groups",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="The groups this user belongs to. A user will get all permissions granted to each of their groups.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.group",
+                        verbose_name="groups",
+                    ),
+                ),
+                (
+                    "user_permissions",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="Specific permissions for this user.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.permission",
+                        verbose_name="user permissions",
+                    ),
+                ),
+            ],
+            options={
+                "verbose_name": "user",
+                "verbose_name_plural": "users",
+                "abstract": False,
+            },
+            managers=[
+                ("objects", django.contrib.auth.models.UserManager()),
+            ],
+        ),
+        migrations.CreateModel(
+            name="EmployerProfile",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("company_name", models.CharField(max_length=160)),
+                (
+                    "company_slug",
+                    models.SlugField(blank=True, max_length=180, unique=True),
+                ),
+                (
+                    "logo",
+                    models.ImageField(
+                        blank=True, null=True, upload_to="company_logos/"
+                    ),
+                ),
+                ("website", models.URLField(blank=True)),
+                ("industry", models.CharField(blank=True, max_length=100)),
+                (
+                    "company_size",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("1-10", "1-10 employees"),
+                            ("11-50", "11-50 employees"),
+                            ("51-200", "51-200 employees"),
+                            ("201-500", "201-500 employees"),
+                            ("500+", "500+ employees"),
+                        ],
+                        max_length=40,
+                    ),
+                ),
+                ("location", models.CharField(blank=True, max_length=140)),
+                ("description", models.TextField(blank=True)),
+                (
+                    "established_year",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="employer_profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+        ),
+        migrations.CreateModel(
+            name="SeekerProfile",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "headline",
+                    models.CharField(
+                        blank=True,
+                        help_text="e.g. Senior Backend Engineer | Python & Cloud",
+                        max_length=160,
+                    ),
+                ),
+                ("bio", models.TextField(blank=True)),
+                ("location", models.CharField(blank=True, max_length=120)),
+                (
+                    "resume",
+                    models.FileField(blank=True, null=True, upload_to="resumes/%Y/%m/"),
+                ),
+                (
+                    "skills",
+                    models.TextField(
+                        blank=True,
+                        help_text="Comma-separated or tag list, e.g. Python, Django, PostgreSQL, Docker",
+                    ),
+                ),
+                ("portfolio_url", models.URLField(blank=True)),
+                ("github_url", models.URLField(blank=True)),
+                ("linkedin_url", models.URLField(blank=True)),
+                (
+                    "expected_salary",
+                    models.PositiveIntegerField(
+                        blank=True, help_text="Annual USD or local currency", null=True
+                    ),
+                ),
+                ("experience_data", models.JSONField(blank=True, default=list)),
+                ("education_data", models.JSONField(blank=True, default=list)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="seeker_profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+        ),
+    ]

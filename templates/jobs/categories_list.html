@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Explore Jobs by Discipline & Category — JobPortal{% endblock %}
+
+{% block content %}
+
+<div class="bg-white border-bottom py-5 mb-4">
+  <div class="container text-center" style="max-width: 760px;">
+    <h1 class="display-5 fw-extrabold text-dark mb-3" style="letter-spacing: -0.02em;">
+      Job Categories
+    </h1>
+    <p class="lead text-muted fs-6 mb-0">
+      Explore open positions across software engineering, AI, design, product management, and cloud infrastructure.
+    </p>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold text-dark mb-0">All Specializations</h4>
+      <span class="text-muted small">{{ categories.count }} specialized domains &bull; {{ total_active_jobs }} active openings</span>
+    </div>
+    <a href="{% url 'jobs:job_list' %}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-search me-1"></i> Browse All Jobs Directly
+    </a>
+  </div>
+
+  <div class="row g-4">
+    {% for cat in categories %}
+      <div class="col-lg-4 col-md-6">
+        <a href="{% url 'jobs:job_list' %}?category={{ cat.slug }}" class="category-card h-100 text-decoration-none d-flex flex-column p-4 bg-white rounded-4 border shadow-xs hover-shadow transition-all">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="category-icon bg-primary-subtle text-primary rounded-3 d-inline-flex align-items-center justify-content-center" style="width: 48px; height: 48px; font-size: 1.4rem;">
+              <i class="bi {{ cat.icon|default:'bi-briefcase' }}"></i>
+            </div>
+            <span class="badge bg-light text-primary border rounded-pill px-3 py-2 fw-semibold">
+              {{ cat.job_count }} open role{{ cat.job_count|pluralize }}
+            </span>
+          </div>
+
+          <h5 class="fw-bold text-dark mb-2">{{ cat.name }}</h5>
+          <p class="text-muted small mb-4 flex-grow-1">
+            {{ cat.description|default:"Explore high-growth positions with top engineering and creative teams." }}
+          </p>
+
+          <div class="d-flex align-items-center text-primary fw-semibold small pt-2 border-top mt-auto">
+            <span>Explore {{ cat.name }} jobs</span>
+            <i class="bi bi-arrow-right ms-auto"></i>
+          </div>
+        </a>
+      </div>
+    {% empty %}
+      <div class="col-12 text-center py-5">
+        <p class="text-muted">No categories available at this moment.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="card border-0 rounded-4 bg-dark text-white p-4 p-md-5 mt-5">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-8">
+        <h3 class="fw-bold text-white mb-2">Can't find your specific specialization?</h3>
+        <p class="text-secondary mb-0">Search through our full catalog of roles using keywords, location parameters, salary filters, and remote availability.</p>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <a href="{% url 'jobs:job_list' %}" class="btn btn-primary px-4 py-2">
+          Search All Postings <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

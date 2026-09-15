@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign In — JobPortal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
+        <div class="card-body p-4 p-md-5">
+          <div class="text-center mb-4">
+            <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 52px; height: 52px;">
+              <i class="bi bi-box-arrow-in-right fs-4"></i>
+            </div>
+            <h3 class="fw-bold text-dark">Welcome back</h3>
+            <p class="text-muted small">Enter your credentials to access your portal account</p>
+          </div>
+
+          <form method="post" action="{% url 'accounts:login' %}">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label class="form-label">Username or Email</label>
+              {{ form.username }}
+              {% if form.username.errors %}
+                <div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label mb-0">Password</label>
+                <a href="{% url 'accounts:password_reset' %}" class="small text-muted text-decoration-none">Forgot password?</a>
+              </div>
+
+              {{ form.password }}
+              {% if form.password.errors %}
+                <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+              Sign In
+            </button>
+          </form>
+
+          <div class="text-center mt-4 pt-3 border-top small text-muted">
+            Don't have an account yet?
+            <a href="{% url 'accounts:register' %}" class="fw-bold text-primary text-decoration-none ms-1">Create an account</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

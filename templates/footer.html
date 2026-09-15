@@ -1,0 +1,78 @@
+{% load static %}
+<footer class="jp-footer mt-5">
+  <div class="container">
+    <div class="row g-4 mb-4">
+
+      <div class="col-lg-4 col-md-6">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <img src="{% static 'images/logo.png' %}" alt="9to5" class="brand-logo-img" style="width: 34px; height: 34px;">
+          <span class="text-white fw-bold fs-5">9to5</span>
+        </div>
+        <p class="small text-secondary pe-lg-4">
+          A modern career platform connecting ambitious software engineers, designers, product managers, and data specialists with innovative technology companies.
+        </p>
+        <div class="d-flex gap-3 text-secondary fs-5 mt-2">
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="text-secondary hover-primary" title="GitHub"><i class="bi bi-github"></i></a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="text-secondary hover-primary" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+          <a href="https://x.com" target="_blank" rel="noopener noreferrer" class="text-secondary hover-primary" title="X (Twitter)"><i class="bi bi-twitter-x"></i></a>
+        </div>
+      </div>
+
+      <div class="col-lg-2 col-md-6 col-6">
+        <h6>For Job Seekers</h6>
+        <ul class="list-unstyled d-flex flex-column gap-2 small">
+          <li><a href="{% url 'jobs:job_list' %}">Browse All Jobs</a></li>
+          <li><a href="{% url 'jobs:job_list' %}?remote=1">Remote Jobs</a></li>
+          <li><a href="{% url 'accounts:resume_builder' %}">Resume Builder</a></li>
+          <li><a href="{% url 'jobs:companies_list' %}">Explore Companies</a></li>
+          <li><a href="{% url 'jobs:categories_list' %}">Browse Categories</a></li>
+          <li><a href="{% url 'career_advice' %}">Career Advice</a></li>
+          <li><a href="{% url 'accounts:register' %}?role=seeker">Create Seeker Profile</a></li>
+          <li><a href="{% url 'dashboard:redirect_dashboard' %}">Track Applications</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-2 col-md-6 col-6">
+        <h6>For Employers</h6>
+        <ul class="list-unstyled d-flex flex-column gap-2 small">
+          <li><a href="{% url 'jobs:job_create' %}">Post a Job</a></li>
+          <li><a href="{% url 'jobs:candidate_sourcing' %}">Candidate Sourcing</a></li>
+          <li><a href="{% url 'pricing' %}">Pricing & Plans</a></li>
+          <li><a href="{% url 'accounts:register' %}?role=employer">Create Company Account</a></li>
+          <li><a href="{% url 'dashboard:redirect_dashboard' %}">Hiring Dashboard</a></li>
+          <li><a href="{% url 'contact' %}">Contact Sales</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <h6>Company & Support</h6>
+        <div class="row g-2 small mb-3">
+          <div class="col-6">
+            <ul class="list-unstyled d-flex flex-column gap-2">
+              <li><a href="{% url 'about' %}">About Us</a></li>
+              <li><a href="{% url 'contact' %}">Contact Support</a></li>
+              <li><a href="{% url 'faq' %}">Help & FAQ</a></li>
+            </ul>
+          </div>
+          <div class="col-6">
+            <ul class="list-unstyled d-flex flex-column gap-2">
+              <li><a href="{% url 'privacy' %}">Privacy Policy</a></li>
+              <li><a href="{% url 'terms' %}">Terms of Service</a></li>
+              <li><a href="{% url 'security' %}">Security & Trust</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-4 mt-4 border-top border-secondary border-opacity-25 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 small text-secondary">
+      <div>&copy; 2025 9to5 Inc. All rights reserved.</div>
+      <div class="d-flex gap-3">
+        <a href="{% url 'privacy' %}" class="text-secondary text-decoration-none">Privacy</a>
+        <a href="{% url 'terms' %}" class="text-secondary text-decoration-none">Terms</a>
+        <a href="{% url 'security' %}" class="text-secondary text-decoration-none">Security</a>
+        <a href="{% url 'contact' %}" class="text-secondary text-decoration-none">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>

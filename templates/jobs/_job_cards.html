@@ -1,0 +1,74 @@
+{% load static %}
+
+<div class="row g-4">
+  {% for job in page_obj %}
+    <div class="col-lg-6 col-xl-4">
+      <div class="jp-job-card">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div class="d-flex align-items-center gap-3">
+            <a href="{% url 'jobs:company_detail' slug=job.employer.company_slug %}" class="text-decoration-none">
+              {% if job.employer.logo %}
+                <img src="{{ job.employer.logo.url }}" alt="{{ job.employer.company_name }}" class="jp-company-logo">
+              {% else %}
+                <div class="jp-company-logo">
+                  {{ job.employer.company_name|slice:":2"|upper }}
+                </div>
+              {% endif %}
+            </a>
+            <div>
+              <h6 class="fw-bold mb-0 text-dark">
+                <a href="{% url 'jobs:job_detail' slug=job.slug %}" class="text-decoration-none text-dark hover-primary">
+                  {{ job.title }}
+                </a>
+              </h6>
+              <div class="small text-muted">
+                <a href="{% url 'jobs:company_detail' slug=job.employer.company_slug %}" class="text-muted text-decoration-none hover-primary">
+                  {{ job.employer.company_name }}
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {% if user.is_authenticated and user.is_seeker %}
+            <button class="btn-bookmark {% if job.id in saved_job_ids %}saved{% endif %}" data-job-id="{{ job.id }}" title="Bookmark job">
+              <i class="bi {% if job.id in saved_job_ids %}bi-bookmark-fill{% else %}bi-bookmark{% endif %}"></i>
+            </button>
+          {% endif %}
+        </div>
+
+        <p class="text-muted small mb-3 flex-grow-1">
+          {{ job.description|truncatewords:16 }}
+        </p>
+
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          {% if job.is_remote %}
+            <span class="jp-badge badge-remote"><i class="bi bi-wifi"></i> Remote</span>
+          {% endif %}
+          <span class="jp-badge badge-fulltime">{{ job.get_job_type_display }}</span>
+          <span class="jp-badge bg-light text-muted border"><i class="bi bi-geo-alt"></i> {{ job.location }}</span>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+          <div>
+            <div class="fw-bold text-dark small">{{ job.salary_display }}</div>
+            <div class="text-muted" style="font-size: 0.72rem;">Posted {{ job.created_at|timesince }} ago</div>
+          </div>
+          <a href="{% url 'jobs:job_detail' slug=job.slug %}" class="btn btn-sm btn-outline-primary">
+            Details
+          </a>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12 py-5 text-center">
+      <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-3" style="width: 68px; height: 68px;">
+        <i class="bi bi-search fs-2 text-muted"></i>
+      </div>
+      <h5 class="fw-bold text-dark mb-1">No matching job listings found</h5>
+      <p class="text-muted small mb-3">Try broadening your search keywords or removing selected filters.</p>
+      <button type="button" class="btn btn-sm btn-primary" id="btn-clear-filters">
+        Clear All Filters
+      </button>
+    </div>
+  {% endfor %}
+</div>

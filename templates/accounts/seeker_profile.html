@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Seeker Profile — JobPortal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+
+    <div class="col-lg-4">
+
+      <div class="jp-card p-4 text-center mb-4">
+        <div class="position-relative d-inline-block mb-3">
+          {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="rounded-circle border border-3 border-white shadow-sm" style="width: 100px; height: 100px; object-fit: cover;">
+          {% else %}
+            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 100px; height: 100px; font-size: 2.2rem; font-weight: 700;">
+              {{ user.username|make_list|first|upper }}
+            </div>
+          {% endif %}
+        </div>
+
+        <h5 class="fw-bold text-dark mb-1">{{ user.get_full_name|default:user.username }}</h5>
+        <p class="text-muted small mb-3">{{ profile.headline|default:"Add your professional headline" }}</p>
+
+        <div class="text-start mb-3">
+          <div class="d-flex justify-content-between small fw-semibold mb-1">
+            <span>Profile Completeness</span>
+            <span class="text-primary">{{ profile.completion_percentage }}%</span>
+          </div>
+          <div class="progress" style="height: 7px;">
+            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ profile.completion_percentage }}%;" aria-valuenow="{{ profile.completion_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+
+        {% if user.is_verified %}
+          <div class="p-2 rounded-3 bg-success-subtle text-success border border-success-subtle small d-flex align-items-center justify-content-center gap-1">
+            <i class="bi bi-patch-check-fill"></i> Verified Candidate
+          </div>
+        {% else %}
+          <div class="p-3 rounded-3 bg-warning-subtle text-warning-emphasis border border-warning-subtle small text-start">
+            <div class="fw-bold mb-1"><i class="bi bi-shield-exclamation me-1"></i> Email Unverified</div>
+            <p class="mb-2" style="font-size: 0.8rem;">Verify your email to boost visibility to hiring managers.</p>
+            <form action="{% url 'accounts:verify_email' %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-warning btn-sm w-100 fw-semibold">
+                Simulate 1-Click Verification
+              </button>
+            </form>
+          </div>
+        {% endif %}
+
+        <div class="border-top pt-3 mt-3 text-start">
+          <div class="small text-muted mb-2"><i class="bi bi-envelope me-2"></i>{{ user.email }}</div>
+          {% if profile.location %}
+            <div class="small text-muted mb-2"><i class="bi bi-geo-alt me-2"></i>{{ profile.location }}</div>
+          {% endif %}
+          {% if profile.expected_salary %}
+            <div class="small text-muted"><i class="bi bi-currency-dollar me-2"></i>${{ profile.expected_salary|floatformat:0 }} / yr</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="jp-card p-3">
+        <h6 class="fw-bold text-dark mb-2 px-2">Navigation</h6>
+        <div class="list-group list-group-flush small">
+          <a href="{% url 'accounts:resume_builder' %}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded-2 py-2 fw-semibold text-primary">
+            <i class="bi bi-magic text-primary"></i> Resume Studio & Builder
+          </a>
+          <a href="{% url 'dashboard:seeker_dashboard' %}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded-2 py-2">
+            <i class="bi bi-speedometer2 text-primary"></i> My Applications & Bookmarks
+          </a>
+          <a href="{% url 'jobs:job_list' %}" class="list-group-item list-group-item-action d-flex align-items-center gap-2 border-0 rounded-2 py-2">
+            <i class="bi bi-search text-info"></i> Browse Job Listings
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <form method="post" enctype="multipart/form-data" action="{% url 'accounts:seeker_profile_edit' %}">
+        {% csrf_token %}
+
+        <div class="jp-card p-4 mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person me-2 text-primary"></i>Basic Information</h5>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">First Name</label>
+              {{ user_form.first_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Last Name</label>
+              {{ user_form.last_name }}
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-control bg-light" value="{{ user.email }}" readonly disabled>
+              <div class="form-text small">Email cannot be changed directly.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone Number</label>
+              {{ user_form.phone }}
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Profile Avatar</label>
+            {{ user_form.avatar }}
+          </div>
+        </div>
+
+        <div class="jp-card p-4 mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="bi bi-briefcase me-2 text-primary"></i>Professional Profile</h5>
+
+          <div class="mb-3">
+            <label class="form-label">Professional Headline</label>
+            {{ profile_form.headline }}
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Location</label>
+              {{ profile_form.location }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Target Annual Salary ($ USD)</label>
+              {{ profile_form.expected_salary }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Skills & Technologies (comma separated)</label>
+            {{ profile_form.skills }}
+            <div class="form-text small">Example: Python, Django, PostgreSQL, Docker, AWS, React</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">About / Executive Summary</label>
+            {{ profile_form.bio }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Resume Document (PDF or Word)</label>
+            {{ profile_form.resume }}
+            {% if profile.resume %}
+              <div class="mt-2 small">
+                <span class="text-success"><i class="bi bi-file-earmark-pdf-fill me-1"></i>Current resume:</span>
+                <a href="{{ profile.resume.url }}" target="_blank" class="fw-semibold text-primary ms-1">Download / View Resume</a>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Portfolio URL</label>
+              {{ profile_form.portfolio_url }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">GitHub URL</label>
+              {{ profile_form.github_url }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">LinkedIn URL</label>
+              {{ profile_form.linkedin_url }}
+            </div>
+          </div>
+        </div>
+
+        <div class="jp-card p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5 class="fw-bold text-dark mb-0"><i class="bi bi-building me-2 text-primary"></i>Work Experience</h5>
+              <small class="text-muted">Highlight previous engineering or leadership roles</small>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="btn-add-experience">
+              <i class="bi bi-plus-lg me-1"></i> Add Experience
+            </button>
+          </div>
+
+          <div id="experience-repeater-container">
+            {% for exp in experiences %}
+              <div class="repeater-item experience-entry">
+                <button type="button" class="btn-remove-item" title="Remove Entry">
+                  <i class="bi bi-x-circle-fill fs-5"></i>
+                </button>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label small text-muted">Job Title</label>
+                    <input type="text" name="exp_title[]" value="{{ exp.title }}" class="form-control" placeholder="e.g. Senior Software Engineer" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small text-muted">Company Name</label>
+                    <input type="text" name="exp_company[]" value="{{ exp.company }}" class="form-control" placeholder="e.g. Acme Corp" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small text-muted">Time Period</label>
+                    <input type="text" name="exp_period[]" value="{{ exp.period }}" class="form-control" placeholder="e.g. 2021 - Present">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small text-muted">Key Achievements & Responsibilities</label>
+                    <textarea name="exp_description[]" class="form-control" rows="2">{{ exp.description }}</textarea>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="text-center py-3 text-muted small" id="no-exp-msg">
+                No experience entries added yet. Click "Add Experience" to add one.
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="jp-card p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5 class="fw-bold text-dark mb-0"><i class="bi bi-mortarboard me-2 text-primary"></i>Education & Credentials</h5>
+              <small class="text-muted">Degrees, certifications, and bootcamps</small>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="btn-add-education">
+              <i class="bi bi-plus-lg me-1"></i> Add Education
+            </button>
+          </div>
+
+          <div id="education-repeater-container">
+            {% for edu in educations %}
+              <div class="repeater-item education-entry">
+                <button type="button" class="btn-remove-item" title="Remove Entry">
+                  <i class="bi bi-x-circle-fill fs-5"></i>
+                </button>
+                <div class="row g-3">
+                  <div class="col-md-5">
+                    <label class="form-label small text-muted">Degree / Certificate</label>
+                    <input type="text" name="edu_degree[]" value="{{ edu.degree }}" class="form-control" placeholder="e.g. B.S. in Computer Science" required>
+                  </div>
+                  <div class="col-md-5">
+                    <label class="form-label small text-muted">School / University</label>
+                    <input type="text" name="edu_institution[]" value="{{ edu.institution }}" class="form-control" placeholder="e.g. Stanford University" required>
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label small text-muted">Graduation Year</label>
+                    <input type="text" name="edu_year[]" value="{{ edu.year }}" class="form-control" placeholder="e.g. 2020">
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="text-center py-3 text-muted small" id="no-edu-msg">
+                No education entries added yet. Click "Add Education" to add one.
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="text-end mb-5">
+          <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm">
+            <i class="bi bi-save me-1"></i> Save Complete Profile
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/dynamic-fields.js' %}"></script>
+{% endblock %}

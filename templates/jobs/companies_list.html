@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browse Tech Companies & Startups Hiring — JobPortal{% endblock %}
+
+{% block content %}
+
+<div class="bg-white border-bottom py-4 mb-4">
+  <div class="container">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div>
+        <h2 class="fw-bold text-dark mb-1">Companies Hiring</h2>
+        <p class="text-muted small mb-0">Browse company profiles, team sizes, and open positions.</p>
+      </div>
+      <div>
+        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fs-6">
+          <span class="text-primary fw-bold">{{ total_count }}</span> Verified Employers
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="row g-4">
+
+    <div class="col-lg-3">
+      <div class="jp-card p-4 sticky-top" style="top: 85px; z-index: 10;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="fw-bold text-dark mb-0"><i class="bi bi-funnel me-1 text-primary"></i> Filter Companies</h6>
+          <a href="{% url 'jobs:companies_list' %}" class="small text-muted text-decoration-none">Reset</a>
+        </div>
+
+        <form action="{% url 'jobs:companies_list' %}" method="get">
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Company Name or Keyword</label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" name="q" value="{{ current_filters.q }}" class="form-control" placeholder="Company, domain...">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Industry Domain</label>
+            <select name="industry" class="form-select form-select-sm">
+              <option value="">All Industries</option>
+              {% for ind in industries %}
+                <option value="{{ ind }}" {% if current_filters.industry == ind %}selected{% endif %}>
+                  {{ ind }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label small text-muted">Company Size</label>
+            <select name="size" class="form-select form-select-sm">
+              <option value="">All Sizes</option>
+              {% for val, label in size_choices %}
+                <option value="{{ val }}" {% if current_filters.size == val %}selected{% endif %}>
+                  {{ label }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-sm w-100 py-2">
+            Apply Filters
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-9">
+      {% if page_obj %}
+        <div class="row g-4">
+          {% for company in page_obj %}
+            <div class="col-md-6 col-xl-4">
+              <div class="jp-card p-4 h-100 d-flex flex-column hover-shadow transition-all">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  {% if company.logo %}
+                    <img src="{{ company.logo.url }}" alt="{{ company.company_name }}" class="jp-company-logo" style="width: 52px; height: 52px;">
+                  {% else %}
+                    <div class="jp-company-logo" style="width: 52px; height: 52px; font-size: 1.3rem;">
+                      {{ company.company_name|slice:":2"|upper }}
+                    </div>
+                  {% endif %}
+                  <div class="overflow-hidden">
+                    <h6 class="fw-bold mb-0 text-truncate">
+                      <a href="{% url 'jobs:company_detail' slug=company.company_slug %}" class="text-decoration-none text-dark hover-primary">
+                        {{ company.company_name }}
+                      </a>
+                    </h6>
+                    <span class="small text-muted text-truncate d-block">{{ company.industry|default:"Technology & SaaS" }}</span>
+                  </div>
+                </div>
+
+                <p class="small text-muted mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                  {{ company.description|default:"Leading company hiring software engineers, designers, and tech leaders." }}
+                </p>
+
+                <div class="d-flex flex-wrap gap-2 mb-3 small">
+                  {% if company.location %}
+                    <span class="badge bg-light text-muted border"><i class="bi bi-geo-alt me-1"></i>{{ company.location }}</span>
+                  {% endif %}
+                  {% if company.company_size %}
+                    <span class="badge bg-light text-muted border"><i class="bi bi-people me-1"></i>{{ company.get_company_size_display|default:company.company_size }}</span>
+                  {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+                  <div>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                      {{ company.active_jobs_count }} open role{{ company.active_jobs_count|pluralize }}
+                    </span>
+                  </div>
+                  <a href="{% url 'jobs:company_detail' slug=company.company_slug %}" class="btn btn-sm btn-outline-primary">
+                    View Profile
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        {% if page_obj.has_other_pages %}
+          <div class="d-flex justify-content-center mt-5">
+            <nav aria-label="Page navigation">
+              <ul class="pagination pagination-sm">
+                {% if page_obj.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ current_filters.q }}&industry={{ current_filters.industry }}&size={{ current_filters.size }}">Previous</a>
+                  </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                  {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                  {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ num }}&q={{ current_filters.q }}&industry={{ current_filters.industry }}&size={{ current_filters.size }}">{{ num }}</a>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ current_filters.q }}&industry={{ current_filters.industry }}&size={{ current_filters.size }}">Next</a>
+                  </li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
+        {% endif %}
+
+      {% else %}
+        <div class="text-center py-5 bg-white rounded-4 border">
+          <i class="bi bi-buildings text-muted fs-1 mb-2 d-block"></i>
+          <h5 class="fw-bold text-dark">No companies found</h5>
+          <p class="text-muted small mb-3">Try adjusting your keyword or industry filter to find more hiring organizations.</p>
+          <a href="{% url 'jobs:companies_list' %}" class="btn btn-primary btn-sm">Clear All Filters</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

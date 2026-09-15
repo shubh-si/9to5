@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Career Advice & Guides — 9to5{% endblock %}
+
+{% block content %}
+
+<section class="py-5 bg-white border-bottom text-center">
+  <div class="container py-3" style="max-width: 780px;">
+    <h1 class="display-5 fw-extrabold text-dark mb-3" style="letter-spacing: -0.02em;">
+      Career Advice & Tech Hiring Guides
+    </h1>
+    <p class="lead text-muted fs-6 mb-0">
+      Practical insights on resume formatting, technical interviews, and salary negotiation.
+    </p>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-4">
+
+    <div class="col-lg-6">
+      <div class="jp-card p-4 h-100 d-flex flex-column hover-shadow transition-all">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <span class="fw-semibold text-primary small">Resume & Profile</span>
+          <span class="text-muted small">6 min read</span>
+        </div>
+        <h4 class="fw-bold text-dark mb-2">How to Format a Software Engineering Resume</h4>
+        <p class="text-muted small mb-4 flex-grow-1">
+          Learn how to highlight quantified impact (e.g. "Reduced API latency by 45% using Redis caching") instead of plain lists of technologies.
+        </p>
+        <div class="p-3 bg-light rounded-3 small mb-3">
+          <div class="fw-bold text-dark mb-1"><i class="bi bi-check-circle-fill text-success me-1"></i> Key Takeaways:</div>
+          <ul class="mb-0 ps-3 text-muted">
+            <li>Lead each bullet point with strong action verbs and metrics.</li>
+            <li>Structure skills by proficiency (Languages, Frameworks, Cloud, Databases).</li>
+            <li>Keep resume length to a concise 1-2 pages in PDF format.</li>
+          </ul>
+        </div>
+        <a href="{% url 'jobs:job_list' %}" class="btn btn-sm btn-outline-primary mt-auto align-self-start">
+          Browse Open Roles <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="jp-card p-4 h-100 d-flex flex-column hover-shadow transition-all">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <span class="fw-semibold text-success small">Interview Prep</span>
+          <span class="text-muted small">8 min read</span>
+        </div>
+        <h4 class="fw-bold text-dark mb-2">System Design Interview Fundamentals</h4>
+        <p class="text-muted small mb-4 flex-grow-1">
+          A framework for tackling distributed system design questions: clarifying requirements, data models, bottlenecks, caching tiers, and scalability trade-offs.
+        </p>
+        <div class="p-3 bg-light rounded-3 small mb-3">
+          <div class="fw-bold text-dark mb-1"><i class="bi bi-check-circle-fill text-success me-1"></i> Key Takeaways:</div>
+          <ul class="mb-0 ps-3 text-muted">
+            <li>Always calculate back-of-the-envelope estimations (QPS, storage).</li>
+            <li>Discuss trade-offs (CAP theorem, SQL vs NoSQL, synchronous vs asynchronous).</li>
+            <li>Drive the conversation rather than waiting for interviewer prompts.</li>
+          </ul>
+        </div>
+        <a href="{% url 'jobs:job_list' %}" class="btn btn-sm btn-outline-primary mt-auto align-self-start">
+          Explore Senior Positions <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="jp-card p-4 h-100 d-flex flex-column hover-shadow transition-all">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <span class="fw-semibold text-warning small">Compensation</span>
+          <span class="text-muted small">5 min read</span>
+        </div>
+        <h4 class="fw-bold text-dark mb-2">Salary & Equity Negotiation Guide</h4>
+        <p class="text-muted small mb-4 flex-grow-1">
+          How to research accurate salary benchmarks, evaluate startup equity options (vesting schedules, strike price), and negotiate multiple offers professionally.
+        </p>
+        <div class="p-3 bg-light rounded-3 small mb-3">
+          <div class="fw-bold text-dark mb-1"><i class="bi bi-check-circle-fill text-success me-1"></i> Key Takeaways:</div>
+          <ul class="mb-0 ps-3 text-muted">
+            <li>Never anchor too low; base discussions on current market benchmarks.</li>
+            <li>Evaluate total compensation: base salary, bonuses, and equity grants.</li>
+            <li>Always maintain a positive, constructive tone during negotiations.</li>
+          </ul>
+        </div>
+        <a href="{% url 'jobs:job_list' %}" class="btn btn-sm btn-outline-primary mt-auto align-self-start">
+          View Roles <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="jp-card p-4 h-100 d-flex flex-column hover-shadow transition-all">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <span class="fw-semibold text-info small">Portfolio</span>
+          <span class="text-muted small">7 min read</span>
+        </div>
+        <h4 class="fw-bold text-dark mb-2">Building Projects That Stand Out to Engineering Teams</h4>
+        <p class="text-muted small mb-4 flex-grow-1">
+          Why clear README documentation, architecture diagrams, live demo URLs, and clean Git commit history matter when showcasing technical skills.
+        </p>
+        <div class="p-3 bg-light rounded-3 small mb-3">
+          <div class="fw-bold text-dark mb-1"><i class="bi bi-check-circle-fill text-success me-1"></i> Key Takeaways:</div>
+          <ul class="mb-0 ps-3 text-muted">
+            <li>Include a live deployment link or brief walkthrough demo.</li>
+            <li>Explain architectural decisions and trade-offs in the project README.</li>
+            <li>Include unit tests and automated build checks.</li>
+          </ul>
+        </div>
+        <a href="{% url 'accounts:seeker_profile_edit' %}" class="btn btn-sm btn-outline-primary mt-auto align-self-start">
+          Update Profile <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

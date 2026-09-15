@@ -1,0 +1,41 @@
+{% if page_obj.has_other_pages %}
+  <nav aria-label="Job listings page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link shadow-xs rounded-2 me-1" href="?page={{ page_obj.previous_page_number }}&q={{ current_filters.q }}&category={{ current_filters.category }}&location={{ current_filters.location }}&job_type={{ current_filters.job_type }}&experience={{ current_filters.experience }}&remote={{ current_filters.remote }}&min_salary={{ current_filters.min_salary }}" aria-label="Previous">
+            &laquo; Prev
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link rounded-2 me-1">&laquo; Prev</span>
+        </li>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li class="page-item active" aria-current="page">
+            <span class="page-link rounded-2 me-1">{{ num }}</span>
+          </li>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <li class="page-item">
+            <a class="page-link rounded-2 me-1" href="?page={{ num }}&q={{ current_filters.q }}&category={{ current_filters.category }}&location={{ current_filters.location }}&job_type={{ current_filters.job_type }}&experience={{ current_filters.experience }}&remote={{ current_filters.remote }}&min_salary={{ current_filters.min_salary }}">{{ num }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link shadow-xs rounded-2" href="?page={{ page_obj.next_page_number }}&q={{ current_filters.q }}&category={{ current_filters.category }}&location={{ current_filters.location }}&job_type={{ current_filters.job_type }}&experience={{ current_filters.experience }}&remote={{ current_filters.remote }}&min_salary={{ current_filters.min_salary }}" aria-label="Next">
+            Next &raquo;
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link rounded-2">Next &raquo;</span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}

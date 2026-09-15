@@ -1,0 +1,720 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resume Builder & Document Hub — JobPortal{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* A4 Resume Preview Styling */
+  .resume-preview-container {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
+    position: sticky;
+    top: 80px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+
+  .a4-sheet {
+    background: #ffffff;
+    width: 100%;
+    min-height: 840px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
+    padding: 2.2rem;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: #1e293b;
+    line-height: 1.5;
+  }
+
+  .resume-section-title {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #2563eb;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 4px;
+    margin-bottom: 12px;
+  }
+
+  .resume-chip {
+    display: inline-block;
+    background: #f1f5f9;
+    color: #334155;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin: 2px;
+  }
+
+  .quick-skill-tag {
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .quick-skill-tag:hover {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+  }
+
+  /* Print Stylesheet for Clean PDF Export */
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    .jp-navbar, .jp-footer, .no-print, .btn, .breadcrumb, #builder-form-col, .nav-pills, .alert {
+      display: none !important;
+    }
+    #printable-resume, #printable-resume * {
+      visibility: visible;
+    }
+    #printable-resume {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      margin: 0;
+      padding: 20mm;
+      box-shadow: none !important;
+      border: none !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="bg-white border-bottom py-4 mb-4 no-print">
+  <div class="container">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div>
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary-subtle text-primary small fw-bold mb-2">
+          <i class="bi bi-file-earmark-person-fill"></i> Resume Studio & Hub
+        </div>
+        <h2 class="fw-bold text-dark mb-1">Interactive Resume Builder & Document Hub</h2>
+        <p class="text-muted small mb-0">Build an ATS-optimized professional resume with real-time preview, or upload your existing PDF/Word file.</p>
+      </div>
+
+      <div>
+        <ul class="nav nav-pills bg-light p-1 rounded-pill border" id="resumeModeTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active rounded-pill px-3 py-1 small fw-semibold" id="tab-builder-btn" data-bs-toggle="pill" data-bs-target="#mode-builder" type="button" role="tab">
+              <i class="bi bi-magic me-1"></i> Interactive Builder
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-3 py-1 small fw-semibold" id="tab-upload-btn" data-bs-toggle="pill" data-bs-target="#mode-upload" type="button" role="tab">
+              <i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload PDF / Word
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="tab-content" id="resumeModeTabContent">
+
+    <div class="tab-pane fade show active" id="mode-builder" role="tabpanel">
+      <div class="row g-4">
+
+        <div class="col-lg-6 no-print" id="builder-form-col">
+          <form id="resume-builder-form" method="post" enctype="multipart/form-data" action="{% url 'accounts:resume_builder' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action_type" value="builder">
+
+            <div class="jp-card p-4 mb-4">
+              <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person-lines-fill me-2 text-primary"></i>1. Personal & Contact Details</h5>
+              <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                  <label class="form-label small fw-semibold">First Name</label>
+                  <input type="text" name="first_name" id="inp-first-name" class="form-control form-control-sm live-sync" value="{{ user.first_name|default:user.username }}" placeholder="John">
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label small fw-semibold">Last Name</label>
+                  <input type="text" name="last_name" id="inp-last-name" class="form-control form-control-sm live-sync" value="{{ user.last_name }}" placeholder="Doe">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Professional Headline / Target Role</label>
+                <input type="text" name="headline" id="inp-headline" class="form-control form-control-sm live-sync" value="{{ profile.headline|default:'Senior Full-Stack Engineer | Python & Cloud' }}" placeholder="e.g. Senior Software Engineer">
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                  <label class="form-label small fw-semibold">Email Address</label>
+                  <input type="email" name="email" id="inp-email" class="form-control form-control-sm live-sync" value="{{ user.email }}" readonly>
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label small fw-semibold">Phone Number</label>
+                  <input type="text" name="phone" id="inp-phone" class="form-control form-control-sm live-sync" value="{{ user.phone }}" placeholder="+1 (555) 000-0000">
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-sm-6">
+                  <label class="form-label small fw-semibold">Location / Base City</label>
+                  <input type="text" name="location" id="inp-location" class="form-control form-control-sm live-sync" value="{{ profile.location|default:'San Francisco, CA' }}" placeholder="City, State / Remote">
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label small fw-semibold">Expected Annual Salary ($ USD)</label>
+                  <input type="number" name="expected_salary" id="inp-salary" class="form-control form-control-sm" value="{{ profile.expected_salary }}" placeholder="e.g. 120000">
+                </div>
+              </div>
+
+              <div class="row g-2">
+                <div class="col-sm-4">
+                  <label class="form-label small text-muted">Portfolio URL</label>
+                  <input type="url" name="portfolio_url" id="inp-portfolio" class="form-control form-control-sm live-sync" value="{{ profile.portfolio_url }}" placeholder="https://portfolio.com">
+                </div>
+                <div class="col-sm-4">
+                  <label class="form-label small text-muted">GitHub</label>
+                  <input type="url" name="github_url" id="inp-github" class="form-control form-control-sm live-sync" value="{{ profile.github_url }}" placeholder="https://github.com/user">
+                </div>
+                <div class="col-sm-4">
+                  <label class="form-label small text-muted">LinkedIn</label>
+                  <input type="url" name="linkedin_url" id="inp-linkedin" class="form-control form-control-sm live-sync" value="{{ profile.linkedin_url }}" placeholder="https://linkedin.com/in/user">
+                </div>
+              </div>
+            </div>
+
+            <div class="jp-card p-4 mb-4">
+              <h5 class="fw-bold text-dark mb-2"><i class="bi bi-card-text me-2 text-primary"></i>2. Professional Summary</h5>
+              <p class="small text-muted mb-2">2-3 sentences highlighting your years of experience, core stacks, and proud achievements.</p>
+              <textarea name="bio" id="inp-bio" class="form-control form-control-sm live-sync" rows="3" placeholder="Passionate software engineer with 5+ years building scalable distributed microservices, optimizing database pipelines, and leading agile engineering sprints.">{{ profile.bio|default:'Passionate software engineer with 5+ years building scalable distributed microservices, optimizing database pipelines, and leading agile engineering sprints.' }}</textarea>
+            </div>
+
+            <div class="jp-card p-4 mb-4">
+              <h5 class="fw-bold text-dark mb-2"><i class="bi bi-cpu me-2 text-primary"></i>3. Skills & Technologies</h5>
+              <p class="small text-muted mb-2">Separate skills with commas. Click quick chips below to add instantly.</p>
+              <input type="text" name="skills" id="inp-skills" class="form-control form-control-sm live-sync mb-2" value="{{ profile.skills|default:'Python, Django, React, TypeScript, PostgreSQL, Docker, AWS, Redis, REST APIs, Git' }}" placeholder="Python, Django, React, AWS, Docker">
+
+              <div class="d-flex flex-wrap gap-1 small mt-2">
+                <span class="text-muted me-1" style="font-size: 0.75rem;">Suggestions:</span>
+                {% for tag in "Python,Django,React,TypeScript,PostgreSQL,Docker,Kubernetes,AWS,GraphQL,Redis,Node.js,Next.js,Machine Learning,System Design,CI/CD"|make_list|join:""|make_list %}
+                {% endfor %}
+                <span class="badge bg-light text-dark border quick-skill-tag" data-tag="Python">+ Python</span>
+                <span class="badge bg-light text-dark border quick-skill-tag" data-tag="Django">+ Django</span>
+                <span class="badge bg-light text-dark border quick-skill-tag" data-tag="React">+ React</span>
+                <span class="badge bg-light text-dark border quick-skill-tag" data-tag="TypeScript">+ TypeScript</span>
+                <span class="badge bg-light text-dark border quick-skill-tag" data-tag="PostgreSQL">+ PostgreSQL</span>
+                <span class="badge bg-light text-dark border quick-skill-tag" data-tag="Docker">+ Docker</span>
+                <span class="badge bg-light text-dark border quick-skill-tag" data-tag="AWS">+ AWS</span>
+                <span class="badge bg-light text-dark border quick-skill-tag" data-tag="Redis">+ Redis</span>
+                <span class="badge bg-light text-dark border quick-skill-tag" data-tag="Kubernetes">+ Kubernetes</span>
+              </div>
+            </div>
+
+            <div class="jp-card p-4 mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h5 class="fw-bold text-dark mb-0"><i class="bi bi-briefcase me-2 text-primary"></i>4. Work Experience</h5>
+                  <small class="text-muted">Previous employment and roles</small>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-add-builder-exp">
+                  <i class="bi bi-plus-lg me-1"></i> Add Experience
+                </button>
+              </div>
+
+              <div id="builder-exp-container">
+                {% for exp in experiences %}
+                  <div class="repeater-item exp-item p-3 rounded-3 border bg-light mb-3 position-relative">
+                    <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 btn-remove-row" title="Remove">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                    <div class="row g-2 mb-2">
+                      <div class="col-sm-6">
+                        <label class="form-label small text-muted mb-0">Job Title</label>
+                        <input type="text" name="exp_title[]" class="form-control form-control-sm exp-title-inp live-sync" value="{{ exp.title }}" placeholder="e.g. Senior Backend Engineer" required>
+                      </div>
+                      <div class="col-sm-6">
+                        <label class="form-label small text-muted mb-0">Company Name</label>
+                        <input type="text" name="exp_company[]" class="form-control form-control-sm exp-company-inp live-sync" value="{{ exp.company }}" placeholder="e.g. Acme Tech" required>
+                      </div>
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label small text-muted mb-0">Time Period / Dates</label>
+                      <input type="text" name="exp_period[]" class="form-control form-control-sm exp-period-inp live-sync" value="{{ exp.period }}" placeholder="e.g. 2022 - Present">
+                    </div>
+                    <div>
+                      <label class="form-label small text-muted mb-0">Achievements & Responsibilities</label>
+                      <textarea name="exp_description[]" class="form-control form-control-sm exp-desc-inp live-sync" rows="2" placeholder="Engineered high-throughput endpoints, reduced latency...">{{ exp.description }}</textarea>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="jp-card p-4 mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h5 class="fw-bold text-dark mb-0"><i class="bi bi-mortarboard me-2 text-primary"></i>5. Education</h5>
+                  <small class="text-muted">Degrees & certifications</small>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-add-builder-edu">
+                  <i class="bi bi-plus-lg me-1"></i> Add Education
+                </button>
+              </div>
+
+              <div id="builder-edu-container">
+                {% for edu in educations %}
+                  <div class="repeater-item edu-item p-3 rounded-3 border bg-light mb-3 position-relative">
+                    <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 btn-remove-row" title="Remove">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                    <div class="row g-2 mb-2">
+                      <div class="col-sm-6">
+                        <label class="form-label small text-muted mb-0">Degree / Certificate</label>
+                        <input type="text" name="edu_degree[]" class="form-control form-control-sm edu-degree-inp live-sync" value="{{ edu.degree }}" placeholder="e.g. B.S. in Computer Science" required>
+                      </div>
+                      <div class="col-sm-6">
+                        <label class="form-label small text-muted mb-0">University / College</label>
+                        <input type="text" name="edu_institution[]" class="form-control form-control-sm edu-inst-inp live-sync" value="{{ edu.institution }}" placeholder="e.g. Stanford University" required>
+                      </div>
+                    </div>
+                    <div>
+                      <label class="form-label small text-muted mb-0">Graduation Year</label>
+                      <input type="text" name="edu_year[]" class="form-control form-control-sm edu-year-inp live-sync" value="{{ edu.year }}" placeholder="e.g. 2020">
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="jp-card p-4 mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h5 class="fw-bold text-dark mb-0"><i class="bi bi-folder-check me-2 text-primary"></i>6. Key Projects</h5>
+                  <small class="text-muted">Showcase top portfolio or open source highlights</small>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-add-builder-proj">
+                  <i class="bi bi-plus-lg me-1"></i> Add Project
+                </button>
+              </div>
+
+              <div id="builder-proj-container">
+                {% for proj in projects %}
+                  <div class="repeater-item proj-item p-3 rounded-3 border bg-light mb-3 position-relative">
+                    <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 btn-remove-row" title="Remove">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                    <div class="row g-2 mb-2">
+                      <div class="col-sm-6">
+                        <label class="form-label small text-muted mb-0">Project Name</label>
+                        <input type="text" name="proj_title[]" class="form-control form-control-sm proj-title-inp live-sync" value="{{ proj.title }}" placeholder="e.g. Real-Time Analytics Dashboard" required>
+                      </div>
+                      <div class="col-sm-6">
+                        <label class="form-label small text-muted mb-0">Tech Stack</label>
+                        <input type="text" name="proj_tech[]" class="form-control form-control-sm proj-tech-inp live-sync" value="{{ proj.tech }}" placeholder="e.g. Python, Docker, Redis">
+                      </div>
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label small text-muted mb-0">Project / Demo Link</label>
+                      <input type="url" name="proj_link[]" class="form-control form-control-sm proj-link-inp live-sync" value="{{ proj.link }}" placeholder="https://github.com/...">
+                    </div>
+                    <div>
+                      <label class="form-label small text-muted mb-0">Project Description & Impact</label>
+                      <textarea name="proj_description[]" class="form-control form-control-sm proj-desc-inp live-sync" rows="2" placeholder="Engineered an event-driven system handling 100k events/sec...">{{ proj.description }}</textarea>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="jp-card p-4 mb-4">
+              <h5 class="fw-bold text-dark mb-2"><i class="bi bi-paperclip me-2 text-primary"></i>Attach Generated or Custom File (Optional)</h5>
+              <p class="small text-muted mb-3">Upload a customized PDF or DOCX file to attach alongside your profile.</p>
+              <input type="file" name="builder_resume_file" class="form-control form-control-sm" accept=".pdf,.doc,.docx">
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-5">
+              <button type="button" class="btn btn-outline-secondary" onclick="window.print();">
+                <i class="bi bi-printer me-1"></i> Print / Export PDF
+              </button>
+              <button type="submit" class="btn btn-primary px-4 py-2">
+                <i class="bi bi-check-circle-fill me-1"></i> Save & Sync to Profile
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="resume-preview-container">
+
+            <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-circle-fill" style="font-size: 0.55rem;"></i> Live Preview</span>
+                <span class="small text-muted">Standard A4 Format</span>
+              </div>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-primary shadow-xs" onclick="window.print();">
+                  <i class="bi bi-file-earmark-pdf-fill me-1"></i> Download / Print PDF
+                </button>
+              </div>
+            </div>
+
+            <div class="a4-sheet" id="printable-resume">
+
+              <div class="border-bottom pb-3 mb-3">
+                <h2 class="fw-extrabold text-dark mb-1" id="prev-name" style="letter-spacing: -0.02em;">
+                  {{ user.get_full_name|default:user.username|default:"Alex Johnson" }}
+                </h2>
+                <div class="fw-bold text-primary mb-2" id="prev-headline" style="font-size: 1.05rem;">
+                  {{ profile.headline|default:"Senior Full-Stack Engineer | Python & Cloud" }}
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center gap-3 text-muted small" id="prev-contacts" style="font-size: 0.8rem;">
+                  <span id="prev-email"><i class="bi bi-envelope me-1 text-primary"></i>{{ user.email|default:"alex@example.com" }}</span>
+                  <span id="prev-phone"><i class="bi bi-telephone me-1 text-primary"></i>{{ user.phone|default:"+1 (555) 019-2834" }}</span>
+                  <span id="prev-location"><i class="bi bi-geo-alt me-1 text-primary"></i>{{ profile.location|default:"San Francisco, CA" }}</span>
+                  <span id="prev-portfolio"><i class="bi bi-globe me-1 text-primary"></i>{{ profile.portfolio_url|default:"portfolio.dev" }}</span>
+                </div>
+              </div>
+
+              <div class="mb-3" id="prev-summary-sec">
+                <div class="resume-section-title">Professional Summary</div>
+                <p class="small text-secondary mb-0" id="prev-bio" style="font-size: 0.85rem; text-align: justify;">
+                  {{ profile.bio|default:"Passionate software engineer with 5+ years building scalable distributed microservices, optimizing database pipelines, and leading agile engineering sprints." }}
+                </p>
+              </div>
+
+              <div class="mb-3" id="prev-skills-sec">
+                <div class="resume-section-title">Core Competencies & Stack</div>
+                <div id="prev-skills-list" class="d-flex flex-wrap gap-1">
+
+                  {% for sk in profile.get_skills_list %}
+                    <span class="resume-chip">{{ sk }}</span>
+                  {% empty %}
+                    <span class="resume-chip">Python</span>
+                    <span class="resume-chip">Django</span>
+                    <span class="resume-chip">React</span>
+                    <span class="resume-chip">TypeScript</span>
+                    <span class="resume-chip">PostgreSQL</span>
+                    <span class="resume-chip">Docker</span>
+                    <span class="resume-chip">AWS</span>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="mb-3" id="prev-exp-sec">
+                <div class="resume-section-title">Professional Experience</div>
+                <div id="prev-exp-list" class="d-flex flex-column gap-3">
+                  {% for exp in experiences %}
+                    <div>
+                      <div class="d-flex justify-content-between align-items-baseline">
+                        <div class="fw-bold text-dark small">{{ exp.title }}</div>
+                        <div class="small text-muted" style="font-size: 0.75rem;">{{ exp.period }}</div>
+                      </div>
+                      <div class="fw-semibold text-primary" style="font-size: 0.8rem;">{{ exp.company }}</div>
+                      <div class="small text-secondary mt-1" style="font-size: 0.8rem; white-space: pre-line;">{{ exp.description }}</div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="mb-3" id="prev-proj-sec">
+                <div class="resume-section-title">Featured Projects</div>
+                <div id="prev-proj-list" class="d-flex flex-column gap-2">
+                  {% for proj in projects %}
+                    <div>
+                      <div class="d-flex justify-content-between align-items-baseline">
+                        <div class="fw-bold text-dark small">{{ proj.title }}</div>
+                        {% if proj.tech %}
+                          <span class="badge bg-light text-secondary border" style="font-size: 0.7rem;">{{ proj.tech }}</span>
+                        {% endif %}
+                      </div>
+                      <div class="small text-secondary" style="font-size: 0.8rem;">{{ proj.description }}</div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="mb-2" id="prev-edu-sec">
+                <div class="resume-section-title">Education & Credentials</div>
+                <div id="prev-edu-list" class="d-flex flex-column gap-2">
+                  {% for edu in educations %}
+                    <div class="d-flex justify-content-between align-items-baseline">
+                      <div>
+                        <span class="fw-bold text-dark small">{{ edu.degree }}</span>
+                        <span class="text-muted small"> &bull; {{ edu.institution }}</span>
+                      </div>
+                      <div class="small text-muted" style="font-size: 0.75rem;">{{ edu.year }}</div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="mode-upload" role="tabpanel">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="jp-card p-4 p-md-5">
+            <div class="text-center mb-4">
+              <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                <i class="bi bi-file-earmark-arrow-up-fill fs-3"></i>
+              </div>
+              <h3 class="fw-bold text-dark">Upload Prepared Resume Document</h3>
+              <p class="text-muted small">Upload your resume in PDF or Word document format to attach to all 1-click job applications.</p>
+            </div>
+
+            {% if profile.resume %}
+              <div class="p-3 bg-light rounded-3 border d-flex align-items-center justify-content-between mb-4">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rounded-3 bg-danger-subtle text-danger p-2 fs-4">
+                    <i class="bi bi-file-earmark-pdf-fill"></i>
+                  </div>
+                  <div>
+                    <div class="fw-bold text-dark small">Current Profile Resume</div>
+                    <div class="small text-muted">Attached to your active account</div>
+                  </div>
+                </div>
+                <a href="{{ profile.resume.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-eye me-1"></i> View / Download
+                </a>
+              </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" action="{% url 'accounts:resume_builder' %}">
+              {% csrf_token %}
+              <input type="hidden" name="action_type" value="upload_file">
+
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Select Resume Document (.pdf, .doc, .docx)</label>
+                <input type="file" name="resume_file" class="form-control form-control-lg" accept=".pdf,.doc,.docx" required>
+                <div class="form-text small">Maximum file size: 10MB. We recommend PDF format for best cross-platform layout preservation.</div>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">
+                <i class="bi bi-cloud-check-fill me-2"></i> Upload & Set as Primary Resume
+              </button>
+            </form>
+
+            <div class="text-center mt-4 pt-3 border-top small text-muted">
+              Prefer to create an interactive formatted resume?
+              <a href="#" class="fw-bold text-primary text-decoration-none ms-1" onclick="$('#tab-builder-btn').tab('show');">Switch to Interactive Builder</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function () {
+
+    function updatePreview() {
+
+      const fName = $('#inp-first-name').val() || '';
+      const lName = $('#inp-last-name').val() || '';
+      $('#prev-name').text((fName + ' ' + lName).trim() || 'Alex Johnson');
+
+      $('#prev-headline').text($('#inp-headline').val() || 'Software Engineer');
+
+      $('#prev-bio').text($('#inp-bio').val() || '');
+
+      const email = $('#inp-email').val();
+      const phone = $('#inp-phone').val();
+      const location = $('#inp-location').val();
+      const portfolio = $('#inp-portfolio').val();
+
+      $('#prev-email').html(email ? `<i class="bi bi-envelope me-1 text-primary"></i>${email}` : '');
+      $('#prev-phone').html(phone ? `<i class="bi bi-telephone me-1 text-primary"></i>${phone}` : '');
+      $('#prev-location').html(location ? `<i class="bi bi-geo-alt me-1 text-primary"></i>${location}` : '');
+      $('#prev-portfolio').html(portfolio ? `<i class="bi bi-globe me-1 text-primary"></i>${portfolio}` : '');
+
+      const skillsStr = $('#inp-skills').val() || '';
+      const skillsArr = skillsStr.split(',').map(s => s.trim()).filter(s => s.length > 0);
+      let skillsHtml = '';
+      skillsArr.forEach(sk => {
+        skillsHtml += `<span class="resume-chip">${sk}</span>`;
+      });
+      $('#prev-skills-list').html(skillsHtml);
+
+      let expHtml = '';
+      $('#builder-exp-container .exp-item').each(function () {
+        const title = $(this).find('.exp-title-inp').val();
+        const company = $(this).find('.exp-company-inp').val();
+        const period = $(this).find('.exp-period-inp').val();
+        const desc = $(this).find('.exp-desc-inp').val();
+
+        if (title || company) {
+          expHtml += `
+            <div>
+              <div class="d-flex justify-content-between align-items-baseline">
+                <div class="fw-bold text-dark small">${title}</div>
+                <div class="small text-muted" style="font-size: 0.75rem;">${period}</div>
+              </div>
+              <div class="fw-semibold text-primary" style="font-size: 0.8rem;">${company}</div>
+              <div class="small text-secondary mt-1" style="font-size: 0.8rem; white-space: pre-line;">${desc}</div>
+            </div>
+          `;
+        }
+      });
+      $('#prev-exp-list').html(expHtml);
+
+      let eduHtml = '';
+      $('#builder-edu-container .edu-item').each(function () {
+        const degree = $(this).find('.edu-degree-inp').val();
+        const inst = $(this).find('.edu-inst-inp').val();
+        const year = $(this).find('.edu-year-inp').val();
+
+        if (degree || inst) {
+          eduHtml += `
+            <div class="d-flex justify-content-between align-items-baseline">
+              <div>
+                <span class="fw-bold text-dark small">${degree}</span>
+                <span class="text-muted small"> &bull; ${inst}</span>
+              </div>
+              <div class="small text-muted" style="font-size: 0.75rem;">${year}</div>
+            </div>
+          `;
+        }
+      });
+      $('#prev-edu-list').html(eduHtml);
+
+      let projHtml = '';
+      $('#builder-proj-container .proj-item').each(function () {
+        const title = $(this).find('.proj-title-inp').val();
+        const tech = $(this).find('.proj-tech-inp').val();
+        const desc = $(this).find('.proj-desc-inp').val();
+
+        if (title) {
+          projHtml += `
+            <div>
+              <div class="d-flex justify-content-between align-items-baseline">
+                <div class="fw-bold text-dark small">${title}</div>
+                ${tech ? `<span class="badge bg-light text-secondary border" style="font-size: 0.7rem;">${tech}</span>` : ''}
+              </div>
+              <div class="small text-secondary" style="font-size: 0.8rem;">${desc}</div>
+            </div>
+          `;
+        }
+      });
+      $('#prev-proj-list').html(projHtml);
+    }
+
+    $(document).on('input keyup change', '.live-sync', function () {
+      updatePreview();
+    });
+
+    $(document).on('click', '.quick-skill-tag', function () {
+      const tag = $(this).data('tag');
+      const $skillsInp = $('#inp-skills');
+      let current = $skillsInp.val().trim();
+      if (!current) {
+        $skillsInp.val(tag);
+      } else if (!current.toLowerCase().includes(tag.toLowerCase())) {
+        $skillsInp.val(current + ', ' + tag);
+      }
+      $skillsInp.trigger('change');
+    });
+
+    $('#btn-add-builder-exp').on('click', function () {
+      const row = `
+        <div class="repeater-item exp-item p-3 rounded-3 border bg-light mb-3 position-relative">
+          <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 btn-remove-row" title="Remove">
+            <i class="bi bi-trash"></i>
+          </button>
+          <div class="row g-2 mb-2">
+            <div class="col-sm-6">
+              <label class="form-label small text-muted mb-0">Job Title</label>
+              <input type="text" name="exp_title[]" class="form-control form-control-sm exp-title-inp live-sync" placeholder="e.g. Software Engineer" required>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label small text-muted mb-0">Company Name</label>
+              <input type="text" name="exp_company[]" class="form-control form-control-sm exp-company-inp live-sync" placeholder="e.g. Acme Corp" required>
+            </div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small text-muted mb-0">Time Period / Dates</label>
+            <input type="text" name="exp_period[]" class="form-control form-control-sm exp-period-inp live-sync" placeholder="e.g. 2021 - 2023">
+          </div>
+          <div>
+            <label class="form-label small text-muted mb-0">Achievements & Responsibilities</label>
+            <textarea name="exp_description[]" class="form-control form-control-sm exp-desc-inp live-sync" rows="2" placeholder="Responsibilities and key contributions..."></textarea>
+          </div>
+        </div>
+      `;
+      $('#builder-exp-container').append(row);
+      updatePreview();
+    });
+
+    $('#btn-add-builder-edu').on('click', function () {
+      const row = `
+        <div class="repeater-item edu-item p-3 rounded-3 border bg-light mb-3 position-relative">
+          <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 btn-remove-row" title="Remove">
+            <i class="bi bi-trash"></i>
+          </button>
+          <div class="row g-2 mb-2">
+            <div class="col-sm-6">
+              <label class="form-label small text-muted mb-0">Degree / Certificate</label>
+              <input type="text" name="edu_degree[]" class="form-control form-control-sm edu-degree-inp live-sync" placeholder="e.g. B.S. in Software Engineering" required>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label small text-muted mb-0">University / College</label>
+              <input type="text" name="edu_institution[]" class="form-control form-control-sm edu-inst-inp live-sync" placeholder="e.g. University of California" required>
+            </div>
+          </div>
+          <div>
+            <label class="form-label small text-muted mb-0">Graduation Year</label>
+            <input type="text" name="edu_year[]" class="form-control form-control-sm edu-year-inp live-sync" placeholder="e.g. 2022">
+          </div>
+        </div>
+      `;
+      $('#builder-edu-container').append(row);
+      updatePreview();
+    });
+
+    $('#btn-add-builder-proj').on('click', function () {
+      const row = `
+        <div class="repeater-item proj-item p-3 rounded-3 border bg-light mb-3 position-relative">
+          <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 btn-remove-row" title="Remove">
+            <i class="bi bi-trash"></i>
+          </button>
+          <div class="row g-2 mb-2">
+            <div class="col-sm-6">
+              <label class="form-label small text-muted mb-0">Project Name</label>
+              <input type="text" name="proj_title[]" class="form-control form-control-sm proj-title-inp live-sync" placeholder="e.g. E-Commerce Microservices" required>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label small text-muted mb-0">Tech Stack</label>
+              <input type="text" name="proj_tech[]" class="form-control form-control-sm proj-tech-inp live-sync" placeholder="e.g. Python, Docker, PostgreSQL">
+            </div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small text-muted mb-0">Project Link</label>
+            <input type="url" name="proj_link[]" class="form-control form-control-sm proj-link-inp live-sync" placeholder="https://github.com/...">
+          </div>
+          <div>
+            <label class="form-label small text-muted mb-0">Project Description</label>
+            <textarea name="proj_description[]" class="form-control form-control-sm proj-desc-inp live-sync" rows="2" placeholder="Brief project overview..."></textarea>
+          </div>
+        </div>
+      `;
+      $('#builder-proj-container').append(row);
+      updatePreview();
+    });
+
+    $(document).on('click', '.btn-remove-row', function () {
+      $(this).closest('.repeater-item').remove();
+      updatePreview();
+    });
+
+    updatePreview();
+  });
+
+</script>
+{% endblock %}

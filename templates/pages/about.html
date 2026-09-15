@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us — 9to5{% endblock %}
+
+{% block content %}
+
+<section class="py-5 bg-white border-bottom">
+  <div class="container text-center py-4" style="max-width: 820px;">
+    <h1 class="display-4 fw-extrabold text-dark mb-4" style="letter-spacing: -0.03em;">
+      Connecting tech talent with <span class="text-primary">great companies</span>
+    </h1>
+    <p class="lead text-muted fs-5 mb-0">
+      9to5 is a career platform designed for software engineering, design, product, and data teams. We provide direct hiring connections between candidates and growing companies.
+    </p>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="jp-card p-4 h-100">
+          <div class="display-5 fw-bold text-primary mb-2">{{ stats.jobs }}</div>
+          <h6 class="fw-bold text-dark mb-1">Active Positions</h6>
+          <p class="text-muted small mb-0">Verified engineering, design, and product roles.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="jp-card p-4 h-100">
+          <div class="display-5 fw-bold text-dark mb-2">{{ stats.companies }}</div>
+          <h6 class="fw-bold text-dark mb-1">Hiring Companies</h6>
+          <p class="text-muted small mb-0">From early-stage startups to established teams.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="jp-card p-4 h-100">
+          <div class="display-5 fw-bold text-primary mb-2">{{ stats.seekers }}</div>
+          <h6 class="fw-bold text-dark mb-1">Registered Candidates</h6>
+          <p class="text-muted small mb-0">Professionals discovering their next role.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-white border-top border-bottom">
+  <div class="container">
+    <div class="text-center mb-5" style="max-width: 600px; margin: 0 auto;">
+      <h2 class="fw-bold text-dark mb-2">Our Values</h2>
+      <p class="text-muted">A hiring platform focused on clarity, speed, and fairness.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="p-4 rounded-4 border bg-light h-100">
+          <div class="rounded-3 bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center p-3 mb-3" style="width: 52px; height: 52px; font-size: 1.4rem;">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Verified Job Openings</h5>
+          <p class="text-muted small mb-0">Every listing represents a real opening with clear role expectations and active hiring budgets.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="p-4 rounded-4 border bg-light h-100">
+          <div class="rounded-3 bg-success-subtle text-success d-inline-flex align-items-center justify-content-center p-3 mb-3" style="width: 52px; height: 52px; font-size: 1.4rem;">
+            <i class="bi bi-lightning-charge-fill"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Fast Applications</h5>
+          <p class="text-muted small mb-0">Apply with your profile or resume in one click and track your status in real time.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="p-4 rounded-4 border bg-light h-100">
+          <div class="rounded-3 bg-info-subtle text-info d-inline-flex align-items-center justify-content-center p-3 mb-3" style="width: 52px; height: 52px; font-size: 1.4rem;">
+            <i class="bi bi-eye-fill"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Salary Transparency</h5>
+          <p class="text-muted small mb-0">Clear salary expectations upfront so candidates and employers are aligned from the start.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-white border-top text-center">
+  <div class="container py-3" style="max-width: 650px;">
+    <h3 class="fw-bold text-dark mb-3">Ready to find your next role?</h3>
+    <p class="text-muted mb-4">Browse open positions or create your candidate profile today.</p>
+    <div class="d-flex justify-content-center gap-3">
+      <a href="{% url 'jobs:job_list' %}" class="btn btn-primary px-4 py-2">
+        Browse Jobs
+      </a>
+      <a href="{% url 'accounts:register' %}?role=employer" class="btn btn-outline-secondary px-4 py-2">
+        Hire Talent
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

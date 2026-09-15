@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Site Administration Dashboard — JobPortal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Superuser Area</span>
+        <h3 class="fw-bold text-dark mb-0">Platform Executive Dashboard</h3>
+      </div>
+      <div class="small text-muted">Site-wide operational analytics, moderation queue, and user metrics</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="/admin/" target="_blank" class="btn btn-outline-dark btn-sm">
+        <i class="bi bi-gear-fill me-1"></i> Django Admin Site
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-2">
+      <div class="metric-card p-3">
+        <div>
+          <div class="h3 fw-bold text-dark mb-0">{{ total_users }}</div>
+          <div class="text-muted small">Total Users</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-2">
+      <div class="metric-card p-3">
+        <div>
+          <div class="h3 fw-bold text-primary mb-0">{{ total_seekers }}</div>
+          <div class="text-muted small">Job Seekers</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-2">
+      <div class="metric-card p-3">
+        <div>
+          <div class="h3 fw-bold text-success mb-0">{{ total_employers }}</div>
+          <div class="text-muted small">Companies</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-2">
+      <div class="metric-card p-3">
+        <div>
+          <div class="h3 fw-bold text-dark mb-0">{{ total_jobs }}</div>
+          <div class="text-muted small">Total Postings</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-2">
+      <div class="metric-card p-3">
+        <div>
+          <div class="h3 fw-bold text-emerald mb-0 text-success">{{ active_jobs }}</div>
+          <div class="text-muted small">Active / Live</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-2">
+      <div class="metric-card p-3">
+        <div>
+          <div class="h3 fw-bold text-warning mb-0" id="pending-counter-badge">{{ pending_jobs }}</div>
+          <div class="text-muted small">Pending Queue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="jp-card p-4 mb-4 border-warning-subtle">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-shield-check text-warning fs-4"></i>
+        <h5 class="fw-bold text-dark mb-0">Job Moderation Queue</h5>
+      </div>
+      <span class="badge bg-warning text-dark">{{ moderation_queue.count }} Pending Review</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light small text-uppercase text-muted">
+          <tr>
+            <th>Job Title & Company</th>
+            <th>Category</th>
+            <th>Location & Type</th>
+            <th>Submitted On</th>
+            <th class="text-end">Moderation Action</th>
+          </tr>
+        </thead>
+        <tbody id="moderation-table-body">
+          {% for pjob in moderation_queue %}
+            <tr class="moderation-row" id="mod-row-{{ pjob.id }}">
+              <td>
+                <div class="fw-bold text-dark">{{ pjob.title }}</div>
+                <div class="small text-muted">{{ pjob.employer.company_name }}</div>
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border">{{ pjob.category.name|default:"General" }}</span>
+              </td>
+              <td class="small text-muted">
+                <div>{{ pjob.location }}</div>
+                <div class="badge bg-secondary-subtle text-secondary">{{ pjob.get_job_type_display }}</div>
+              </td>
+              <td class="small text-muted">
+                {{ pjob.created_at|date:"M d, Y H:i" }}
+              </td>
+              <td class="text-end">
+                <div class="d-inline-flex gap-1">
+                  <button type="button" class="btn btn-sm btn-success btn-moderate-action" data-url="{% url 'dashboard:admin_moderate_job' job_id=pjob.id action='approve' %}" data-action="approve">
+                    <i class="bi bi-check-lg me-1"></i> Approve
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-danger btn-moderate-action" data-url="{% url 'dashboard:admin_moderate_job' job_id=pjob.id action='reject' %}" data-action="reject">
+                    <i class="bi bi-x-lg me-1"></i> Reject
+                  </button>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted py-4">
+                <i class="bi bi-check2-circle text-success fs-3 d-block mb-1"></i>
+                No pending job listings in the queue. All submissions are moderated!
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+
+    <div class="col-lg-6">
+      <div class="jp-card p-4 h-100">
+        <h6 class="fw-bold text-dark mb-3">Job Postings by Category</h6>
+        <div style="height: 270px; position: relative;">
+          <canvas id="categoryChart" data-labels="{{ cat_labels_json }}" data-counts="{{ cat_counts_json }}"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="jp-card p-4 h-100">
+        <h6 class="fw-bold text-dark mb-3">Candidate Applications by Status</h6>
+        <div style="height: 270px; position: relative;">
+          <canvas id="statusChart" data-labels="{{ app_status_labels_json }}" data-counts="{{ app_status_counts_json }}"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="jp-card p-4">
+        <h6 class="fw-bold text-dark mb-3">Recent Candidate Applications</h6>
+        <ul class="list-group list-group-flush small">
+          {% for r_app in recent_applications %}
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-light-subtle">
+              <div>
+                <span class="fw-semibold text-dark">{{ r_app.applicant.username }}</span>
+                <span class="text-muted">applied for</span>
+                <span class="fw-medium text-primary">{{ r_app.job.title|truncatechars:28 }}</span>
+              </div>
+              <span class="badge {{ r_app.status_badge_class }}">{{ r_app.get_status_display }}</span>
+            </li>
+          {% empty %}
+            <li class="list-group-item text-muted">No recent activity</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="jp-card p-4">
+        <h6 class="fw-bold text-dark mb-3">Recently Registered Accounts</h6>
+        <ul class="list-group list-group-flush small">
+          {% for r_user in recent_users %}
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-light-subtle">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi {% if r_user.role == 'EMPLOYER' %}bi-building text-success{% else %}bi-person text-primary{% endif %}"></i>
+                <span class="fw-semibold text-dark">{{ r_user.username }}</span>
+                <span class="text-muted">({{ r_user.email }})</span>
+              </div>
+              <span class="badge bg-light text-muted border">{{ r_user.get_role_display }}</span>
+            </li>
+          {% empty %}
+            <li class="list-group-item text-muted">No recent users</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="{% static 'js/admin-charts.js' %}"></script>
+{% endblock %}

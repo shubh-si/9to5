@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Company Profile — JobPortal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4 justify-content-center">
+
+    <div class="col-lg-8">
+      <div class="jp-card p-4 p-md-5 mb-4">
+        <div class="d-flex align-items-center gap-3 mb-4 border-bottom pb-3">
+          {% if profile.logo %}
+            <img src="{{ profile.logo.url }}" alt="{{ profile.company_name }}" class="jp-company-logo" style="width: 64px; height: 64px; font-size: 1.5rem;">
+          {% else %}
+            <div class="jp-company-logo" style="width: 64px; height: 64px; font-size: 1.5rem;">
+              {{ profile.company_name|slice:":2"|upper }}
+            </div>
+          {% endif %}
+          <div>
+            <h4 class="fw-bold text-dark mb-0">{{ profile.company_name }}</h4>
+            <p class="text-muted small mb-0">Configure your company identity visible to all applicants</p>
+          </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" action="{% url 'accounts:employer_profile_edit' %}">
+          {% csrf_token %}
+
+          {% if profile_form.non_field_errors %}
+            <div class="alert alert-danger mb-3">
+              {% for err in profile_form.non_field_errors %}
+                <div><i class="bi bi-exclamation-circle me-1"></i>{{ err }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% if user_form.non_field_errors %}
+            <div class="alert alert-danger mb-3">
+              {% for err in user_form.non_field_errors %}
+                <div><i class="bi bi-exclamation-circle me-1"></i>{{ err }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark">Company Name <span class="text-danger">*</span></label>
+            {{ profile_form.company_name }}
+            {% if profile_form.company_name.errors %}
+              <div class="text-danger small mt-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ profile_form.company_name.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark">Industry</label>
+              {{ profile_form.industry }}
+              {% if profile_form.industry.errors %}
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ profile_form.industry.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark">Company Size</label>
+              {{ profile_form.company_size }}
+              {% if profile_form.company_size.errors %}
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ profile_form.company_size.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark">Headquarters / Location</label>
+              {{ profile_form.location }}
+              {% if profile_form.location.errors %}
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ profile_form.location.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark">Year Established</label>
+              {{ profile_form.established_year }}
+              {% if profile_form.established_year.errors %}
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ profile_form.established_year.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark">Company Website URL</label>
+            {{ profile_form.website }}
+            {% if profile_form.website.errors %}
+              <div class="text-danger small mt-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ profile_form.website.errors.0 }}</div>
+            {% endif %}
+            <div class="form-text small">Include full URL with https:// (e.g. https://example.com)</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark">Company Logo</label>
+            {{ profile_form.logo }}
+            {% if profile_form.logo.errors %}
+              <div class="text-danger small mt-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ profile_form.logo.errors.0 }}</div>
+            {% endif %}
+            <div class="form-text small">Recommended: Square PNG or JPG image</div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold text-dark">About Company & Culture</label>
+            {{ profile_form.description }}
+            {% if profile_form.description.errors %}
+              <div class="text-danger small mt-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{ profile_form.description.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="border-top pt-4 mb-4">
+            <h6 class="fw-bold text-dark mb-3"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Account Contact Details</h6>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold text-dark">Contact Person Name</label>
+                <div class="input-group">
+                  {{ user_form.first_name }}
+                  {{ user_form.last_name }}
+                </div>
+                {% if user_form.first_name.errors %}
+                  <div class="text-danger small mt-1">{{ user_form.first_name.errors.0 }}</div>
+                {% endif %}
+                {% if user_form.last_name.errors %}
+                  <div class="text-danger small mt-1">{{ user_form.last_name.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold text-dark">Phone Number</label>
+                {{ user_form.phone }}
+                {% if user_form.phone.errors %}
+                  <div class="text-danger small mt-1">{{ user_form.phone.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label fw-semibold text-dark">Registered Account Email</label>
+              <input type="email" class="form-control bg-light" value="{{ user.email }}" readonly disabled>
+              <div class="form-text small">Email address associated with your login account.</div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+            <a href="{% url 'dashboard:employer_dashboard' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+            </a>
+            <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold">
+              <i class="bi bi-check2-circle me-1"></i> Save Company Profile
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

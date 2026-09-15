@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pricing & Plans — 9to5{% endblock %}
+
+{% block content %}
+
+<section class="py-5 bg-white border-bottom text-center">
+  <div class="container py-4" style="max-width: 800px;">
+    <h1 class="display-4 fw-extrabold text-dark mb-3" style="letter-spacing: -0.03em;">
+      Hiring plans for every team
+    </h1>
+    <p class="lead text-muted fs-6 mb-0">
+      Post jobs and connect directly with qualified candidates. No recruiter fees or placement commissions.
+    </p>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4 align-items-stretch">
+
+      <div class="col-lg-4">
+        <div class="jp-card p-4 p-xl-5 h-100 d-flex flex-column border">
+          <div class="mb-4">
+            <h4 class="fw-bold text-dark mb-1">Starter</h4>
+            <p class="small text-muted">For teams posting their first open roles.</p>
+            <div class="d-flex align-items-baseline gap-1 mt-3">
+              <span class="display-5 fw-bold text-dark">$0</span>
+              <span class="text-muted small">/ first 2 job posts</span>
+            </div>
+          </div>
+
+          <ul class="list-unstyled d-flex flex-column gap-3 small text-muted mb-4 flex-grow-1">
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check2 text-success fs-5"></i> 2 Active Job Postings
+            </li>
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check2 text-success fs-5"></i> 30-day listing lifespan
+            </li>
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check2 text-success fs-5"></i> Standard Applicant Tracking
+            </li>
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check2 text-success fs-5"></i> Direct Resume Downloads
+            </li>
+            <li class="d-flex align-items-center gap-2 text-decoration-line-through text-muted opacity-50">
+              <i class="bi bi-x text-muted fs-5"></i> Featured Placement on Homepage
+            </li>
+            <li class="d-flex align-items-center gap-2 text-decoration-line-through text-muted opacity-50">
+              <i class="bi bi-x text-muted fs-5"></i> Candidate Sourcing Database
+            </li>
+          </ul>
+
+          <a href="{% url 'accounts:register' %}?role=employer" class="btn btn-outline-primary w-100 py-2 mt-auto">
+            Get Started
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="jp-card p-4 p-xl-5 h-100 d-flex flex-column border-primary border-2 shadow-sm position-relative bg-white">
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <h4 class="fw-bold text-dark mb-0">Growth</h4>
+              <span class="badge bg-primary text-white">Popular</span>
+            </div>
+            <p class="small text-muted">For expanding teams hiring continuously.</p>
+            <div class="d-flex align-items-baseline gap-1 mt-3">
+              <span class="display-5 fw-bold text-primary">$199</span>
+              <span class="text-muted small">/ month</span>
+            </div>
+          </div>
+
+          <ul class="list-unstyled d-flex flex-column gap-3 small text-muted mb-4 flex-grow-1">
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check-circle-fill text-primary fs-5"></i> <strong>Unlimited Active Job Postings</strong>
+            </li>
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check-circle-fill text-primary fs-5"></i> <strong>Featured Placement on Homepage</strong>
+            </li>
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check-circle-fill text-primary fs-5"></i> Candidate Sourcing Database
+            </li>
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check-circle-fill text-primary fs-5"></i> Team Collaboration & Notes
+            </li>
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check-circle-fill text-primary fs-5"></i> Priority Moderation
+            </li>
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check-circle-fill text-primary fs-5"></i> Company Profile Page
+            </li>
+          </ul>
+
+          <a href="{% url 'accounts:register' %}?role=employer" class="btn btn-primary w-100 py-2 mt-auto shadow-sm">
+            Start Growth Plan
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="jp-card p-4 p-xl-5 h-100 d-flex flex-column border">
+          <div class="mb-4">
+            <h4 class="fw-bold text-dark mb-1">Enterprise</h4>
+            <p class="small text-muted">Custom requirements, high-volume recruiting, and SLA.</p>
+            <div class="d-flex align-items-baseline gap-1 mt-3">
+              <span class="display-5 fw-bold text-dark">Custom</span>
+              <span class="text-muted small">/ annual</span>
+            </div>
+          </div>
+
+          <ul class="list-unstyled d-flex flex-column gap-3 small text-muted mb-4 flex-grow-1">
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check2 text-success fs-5"></i> Everything in Growth Plan
+            </li>
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check2 text-success fs-5"></i> Dedicated Account Manager
+            </li>
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check2 text-success fs-5"></i> ATS Integrations
+            </li>
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check2 text-success fs-5"></i> Single Sign-On (SAML / Okta)
+            </li>
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check2 text-success fs-5"></i> Custom Analytics & Reports
+            </li>
+            <li class="d-flex align-items-center gap-2">
+              <i class="bi bi-check2 text-success fs-5"></i> Service Level Agreement (SLA)
+            </li>
+          </ul>
+
+          <a href="{% url 'contact' %}" class="btn btn-outline-dark w-100 py-2 mt-auto">
+            Contact Sales
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-white border-top">
+  <div class="container" style="max-width: 800px;">
+    <div class="text-center mb-5">
+      <h3 class="fw-bold text-dark mb-2">Frequently Asked Questions</h3>
+      <p class="text-muted">Questions about billing and job management.</p>
+    </div>
+
+    <div class="accordion" id="pricingFaqAccordion">
+      <div class="accordion-item border rounded-3 mb-3 overflow-hidden">
+        <h2 class="accordion-header" id="faqHeadingOne">
+          <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseOne" aria-expanded="true">
+            Are there any placement commissions or hiring fees?
+          </button>
+        </h2>
+        <div id="faqCollapseOne" class="accordion-collapse collapse show" data-bs-parent="#pricingFaqAccordion">
+          <div class="accordion-body small text-muted">
+            No. 9to5 charges zero candidate placement fees. All candidates you hire are 100% yours.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item border rounded-3 mb-3 overflow-hidden">
+        <h2 class="accordion-header" id="faqHeadingTwo">
+          <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseTwo">
+            How fast are job postings approved?
+          </button>
+        </h2>
+        <div id="faqCollapseTwo" class="accordion-collapse collapse" data-bs-parent="#pricingFaqAccordion">
+          <div class="accordion-body small text-muted">
+            Postings are reviewed quickly to ensure quality. Most listings are published within a few hours.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item border rounded-3 overflow-hidden">
+        <h2 class="accordion-header" id="faqHeadingThree">
+          <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseThree">
+            Can I cancel or change plans anytime?
+          </button>
+        </h2>
+        <div id="faqCollapseThree" class="accordion-collapse collapse" data-bs-parent="#pricingFaqAccordion">
+          <div class="accordion-body small text-muted">
+            Yes, you can upgrade, downgrade, or cancel your subscription at any time from your Employer Dashboard.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

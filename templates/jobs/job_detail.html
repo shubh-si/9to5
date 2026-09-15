@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ job.title }} at {{ job.employer.company_name }} — JobPortal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'jobs:job_list' %}" class="text-decoration-none">Jobs</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'jobs:job_list' %}?category={{ job.category.slug }}" class="text-decoration-none">{{ job.category.name }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ job.title }}</li>
+    </ol>
+  </nav>
+
+  <div class="jp-card p-4 p-md-5 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-4">
+      <div class="d-flex gap-3 align-items-start">
+        {% if job.employer.logo %}
+          <img src="{{ job.employer.logo.url }}" alt="{{ job.employer.company_name }}" class="jp-company-logo" style="width: 64px; height: 64px;">
+        {% else %}
+          <div class="jp-company-logo" style="width: 64px; height: 64px; font-size: 1.5rem;">
+            {{ job.employer.company_name|slice:":2"|upper }}
+          </div>
+        {% endif %}
+        <div>
+          <h2 class="fw-extrabold text-dark mb-1" style="letter-spacing: -0.02em;">{{ job.title }}</h2>
+          <div class="d-flex flex-wrap align-items-center gap-2 text-muted small mb-2">
+            <span class="fw-semibold text-dark">{{ job.employer.company_name }}</span>
+            <span>&bull;</span>
+            <span><i class="bi bi-geo-alt me-1"></i>{{ job.location }}</span>
+            <span>&bull;</span>
+            <span><i class="bi bi-eye me-1"></i>{{ job.views_count }} views</span>
+            <span>&bull;</span>
+            <span>Posted {{ job.created_at|timesince }} ago</span>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2">
+            {% if job.is_remote %}
+              <span class="jp-badge badge-remote"><i class="bi bi-wifi"></i> Remote</span>
+            {% endif %}
+            <span class="jp-badge badge-fulltime">{{ job.get_job_type_display }}</span>
+            <span class="jp-badge bg-light text-muted border">{{ job.get_experience_level_display }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2 w-100 w-md-auto justify-content-md-end">
+        {% if user.is_authenticated %}
+          {% if is_seeker %}
+            <button class="btn-bookmark btn border bg-white p-2 px-3 rounded-3 {% if is_saved %}saved{% endif %}" data-job-id="{{ job.id }}" title="Bookmark this role">
+              <i class="bi {% if is_saved %}bi-bookmark-fill text-danger{% else %}bi-bookmark text-muted{% endif %} fs-5"></i>
+            </button>
+
+            {% if has_applied %}
+              <button class="btn btn-outline-success disabled px-4 py-2" id="btn-open-apply-modal">
+                <i class="bi bi-check-circle-fill me-1"></i> Applied ({{ application.get_status_display }})
+              </button>
+            {% else %}
+              <button class="btn btn-primary px-4 py-2" id="btn-open-apply-modal" data-bs-toggle="modal" data-bs-target="#applyJobModal">
+                <i class="bi bi-send-fill me-1"></i> Apply Now
+              </button>
+            {% endif %}
+
+          {% elif is_employer and job.employer == user.employer_profile %}
+            <a href="{% url 'jobs:job_edit' slug=job.slug %}" class="btn btn-outline-secondary">
+              <i class="bi bi-pencil me-1"></i> Edit Listing
+            </a>
+            <a href="{% url 'dashboard:job_applicants' job_slug=job.slug %}" class="btn btn-primary">
+              <i class="bi bi-people me-1"></i> View Applicants
+            </a>
+          {% endif %}
+        {% else %}
+          <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-primary px-4 py-2">
+            Sign In to Apply
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="row g-3 mt-4 pt-4 border-top">
+      <div class="col-sm-4">
+        <div class="text-muted small">Offered Compensation</div>
+        <div class="fs-5 fw-bold text-dark">{{ job.salary_display }}</div>
+      </div>
+      <div class="col-sm-4">
+        <div class="text-muted small">Category</div>
+        <div class="fs-6 fw-semibold text-dark">{{ job.category.name|default:"General" }}</div>
+      </div>
+      <div class="col-sm-4">
+        <div class="text-muted small">Application Deadline</div>
+        <div class="fs-6 fw-semibold text-dark">{{ job.deadline|default:"Open until filled" }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    <div class="col-lg-8">
+
+      <div class="jp-card p-4 p-md-5 mb-4">
+        <h4 class="fw-bold text-dark mb-3">About the Position</h4>
+        <div class="text-muted lh-lg mb-4" style="white-space: pre-line;">
+          {{ job.description }}
+        </div>
+
+        <h4 class="fw-bold text-dark mb-3">Requirements & Skills</h4>
+        <div class="text-muted lh-lg mb-4" style="white-space: pre-line;">
+          {{ job.requirements }}
+        </div>
+
+        {% if job.benefits %}
+          <h4 class="fw-bold text-dark mb-3">Perks & Benefits</h4>
+          <div class="text-muted lh-lg" style="white-space: pre-line;">
+            {{ job.benefits }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+
+      <div class="jp-card p-4 mb-4">
+        <h6 class="fw-bold text-dark mb-3">About the Company</h6>
+        <div class="d-flex align-items-center gap-3 mb-3">
+          {% if job.employer.logo %}
+            <img src="{{ job.employer.logo.url }}" alt="{{ job.employer.company_name }}" class="jp-company-logo">
+          {% else %}
+            <div class="jp-company-logo">
+              {{ job.employer.company_name|slice:":2"|upper }}
+            </div>
+          {% endif %}
+          <div>
+            <h6 class="fw-bold text-dark mb-0">{{ job.employer.company_name }}</h6>
+            <small class="text-muted">{{ job.employer.industry|default:"Technology" }}</small>
+          </div>
+        </div>
+
+        {% if job.employer.description %}
+          <p class="small text-muted mb-3">{{ job.employer.description }}</p>
+        {% endif %}
+
+        <div class="list-group list-group-flush small border-top pt-2">
+          {% if job.employer.location %}
+            <div class="d-flex justify-content-between py-1 text-muted">
+              <span>Location:</span>
+              <span class="text-dark fw-medium">{{ job.employer.location }}</span>
+            </div>
+          {% endif %}
+          {% if job.employer.company_size %}
+            <div class="d-flex justify-content-between py-1 text-muted">
+              <span>Size:</span>
+              <span class="text-dark fw-medium">{{ job.employer.get_company_size_display|default:job.employer.company_size }}</span>
+            </div>
+          {% endif %}
+          {% if job.employer.website %}
+            <div class="d-flex justify-content-between py-1 text-muted">
+              <span>Website:</span>
+              <a href="{{ job.employer.website }}" target="_blank" class="text-primary fw-medium text-truncate" style="max-width: 170px;">
+                {{ job.employer.website }}
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if related_jobs %}
+        <div class="jp-card p-4">
+          <h6 class="fw-bold text-dark mb-3">Similar Jobs</h6>
+          <div class="d-flex flex-column gap-3">
+            {% for rj in related_jobs %}
+              <div class="border-bottom pb-2">
+                <a href="{% url 'jobs:job_detail' slug=rj.slug %}" class="fw-semibold text-dark text-decoration-none hover-primary small d-block">
+                  {{ rj.title }}
+                </a>
+                <div class="d-flex justify-content-between small text-muted mt-1">
+                  <span>{{ rj.employer.company_name }}</span>
+                  <span class="fw-semibold text-dark">{{ rj.salary_display }}</span>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="applyJobModal" tabindex="-1" aria-labelledby="applyJobModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header border-bottom-0 pb-0">
+        <div>
+          <h5 class="modal-title fw-bold text-dark" id="applyJobModalLabel">Apply for {{ job.title }}</h5>
+          <div class="small text-muted">{{ job.employer.company_name }}</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body pt-3">
+
+        <div id="apply-alert-container"></div>
+
+        <form id="job-apply-form" action="{% url 'applications:apply_job' job_id=job.id %}" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="form-inputs-group">
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Resume Document</label>
+              {% if user.seeker_profile.resume %}
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="use_profile_resume" id="useProfileResume" value="1" checked>
+                  <label class="form-check-label small" for="useProfileResume">
+                    Use existing profile resume (<a href="{{ user.seeker_profile.resume.url }}" target="_blank" class="text-primary">View</a>)
+                  </label>
+                </div>
+                <div id="customResumeUploadWrapper" style="display: none;">
+                  <input type="file" name="resume" class="form-control form-control-sm" accept=".pdf,.doc,.docx">
+                  <div class="form-text small">Upload a custom resume for this application.</div>
+                </div>
+              {% else %}
+                <input type="file" name="resume" class="form-control" accept=".pdf,.doc,.docx" required>
+                <div class="form-text small">Upload PDF or Word document (max 10MB).</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Cover Letter / Note to Hiring Manager</label>
+              <textarea name="cover_letter" class="form-control" rows="4" placeholder="Highlight why you are excited about this role and how your expertise aligns with {{ job.employer.company_name }}..."></textarea>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary px-4" id="btn-submit-application">
+              Submit Application
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/applications.js' %}"></script>
+{% endblock %}

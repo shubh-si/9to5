@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Applicants for {{ job.title }} — JobPortal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <div class="small text-muted mb-1">
+        <a href="{% url 'dashboard:employer_dashboard' %}" class="text-decoration-none">
+          <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+      <h3 class="fw-bold text-dark mb-0">Applicants for <span class="text-primary">{{ job.title }}</span></h3>
+      <div class="small text-muted">{{ applications.count }} candidate(s) reviewed</div>
+    </div>
+
+    <div class="btn-group btn-group-sm">
+      <a href="{% url 'dashboard:job_applicants' job_slug=job.slug %}" class="btn {% if not selected_status %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+        All ({{ job.applications.count }})
+      </a>
+      {% for val, label in status_choices %}
+        <a href="{% url 'dashboard:job_applicants' job_slug=job.slug %}?status={{ val }}" class="btn {% if selected_status == val %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+          {{ label }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="jp-card p-4">
+    {% if applications %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light small text-uppercase text-muted">
+            <tr>
+              <th>Candidate</th>
+              <th>Headline & Skills</th>
+              <th>Applied Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+              <th>Update Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in applications %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-inline-flex align-items-center justify-content-center" style="width: 38px; height: 38px; font-size: 0.9rem;">
+                      {{ app.applicant.username|make_list|first|upper }}
+                    </div>
+                    <div>
+                      <div class="fw-bold text-dark">{{ app.applicant.get_full_name|default:app.applicant.username }}</div>
+                      <div class="small text-muted">{{ app.applicant.email }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td style="max-width: 260px;">
+                  <div class="small fw-semibold text-dark text-truncate">{{ app.applicant.seeker_profile.headline|default:"Candidate" }}</div>
+                  <div class="small text-muted text-truncate">{{ app.applicant.seeker_profile.skills|default:"No skills listed" }}</div>
+                </td>
+                <td class="small text-muted">
+                  {{ app.created_at|date:"M d, Y" }}
+                </td>
+                <td>
+                  <span id="status-badge-{{ app.id }}" class="badge {{ app.status_badge_class }}">
+                    {{ app.get_status_display }}
+                  </span>
+                </td>
+                <td>
+                  <div class="d-flex gap-2">
+                    {% if app.resume %}
+                      <a href="{% url 'applications:download_resume' application_id=app.id %}" class="btn btn-sm btn-outline-primary" title="Download Resume">
+                        <i class="bi bi-file-earmark-arrow-down"></i> Resume
+                      </a>
+                    {% else %}
+                      <span class="text-muted small">No file</span>
+                    {% endif %}
+
+                    {% if app.cover_letter %}
+                      <button type="button" class="btn btn-sm btn-light border" data-bs-toggle="modal" data-bs-target="#coverLetterModal{{ app.id }}" title="Read Cover Letter">
+                        <i class="bi bi-chat-left-text"></i> Note
+                      </button>
+
+                      <div class="modal fade" id="coverLetterModal{{ app.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                          <div class="modal-content rounded-4 border-0 shadow">
+                            <div class="modal-header">
+                              <h6 class="modal-title fw-bold">Note from {{ app.applicant.get_full_name|default:app.applicant.username }}</h6>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body small text-muted" style="white-space: pre-line;">
+                              {{ app.cover_letter }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+
+                  <select class="form-select form-select-sm applicant-status-select" data-app-id="{{ app.id }}" style="width: 140px;">
+                    {% for val, label in status_choices %}
+                      <option value="{{ val }}" {% if app.status == val %}selected{% endif %}>
+                        {{ label }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-center py-5">
+        <i class="bi bi-people text-muted fs-1 mb-2 d-block"></i>
+        <h6 class="fw-bold text-dark">No applicants found</h6>
+        <p class="text-muted small mb-0">No candidate submissions match your selected filter.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/applications.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us — JobPortal Support & Partnerships{% endblock %}
+
+{% block content %}
+
+<section class="py-5 bg-white border-bottom">
+  <div class="container text-center py-3" style="max-width: 700px;">
+    <h1 class="display-5 fw-extrabold text-dark mb-3" style="letter-spacing: -0.02em;">
+      Contact Us
+    </h1>
+    <p class="lead text-muted fs-6 mb-0">
+      Have a question about posting jobs, enterprise talent sourcing, account verification, or platform features? We're here to help.
+    </p>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-5">
+
+    <div class="col-lg-7">
+      <div class="jp-card p-4 p-md-5">
+        <h4 class="fw-bold text-dark mb-1">Send us a Message</h4>
+        <p class="text-muted small mb-4">Fill out the form below and our customer engineering team will respond within 24 hours.</p>
+
+        <form method="post" action="{% url 'contact' %}">
+          {% csrf_token %}
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Your Full Name <span class="text-danger">*</span></label>
+              <input type="text" name="name" class="form-control" placeholder="Jane Doe" required value="{% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% endif %}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Email Address <span class="text-danger">*</span></label>
+              <input type="email" name="email" class="form-control" placeholder="jane@company.com" required value="{% if user.is_authenticated %}{{ user.email }}{% endif %}">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Topic / Inquiry Type</label>
+              <select name="inquiry_type" class="form-select">
+                <option value="General Support">General Support & Inquiries</option>
+                <option value="Employer Partnerships">Employer & Recruiting Solutions</option>
+                <option value="Billing & Pricing">Billing & Invoices</option>
+                <option value="Account Verification">Account & Email Verification</option>
+                <option value="Technical Issue">Bug Report / Technical Support</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Subject</label>
+              <input type="text" name="subject" class="form-control" placeholder="Brief summary of your inquiry">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label small fw-semibold">Message <span class="text-danger">*</span></label>
+            <textarea name="message" class="form-control" rows="5" placeholder="How can we assist you today? Please provide any relevant details..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary px-4 py-2">
+            <i class="bi bi-send-fill me-1"></i> Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="d-flex flex-column gap-4">
+
+        <div class="jp-card p-4">
+          <h5 class="fw-bold text-dark mb-3">Direct Support Channels</h5>
+
+          <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
+            <div class="rounded-3 bg-primary-subtle text-primary p-3 d-inline-flex align-items-center justify-content-center" style="width: 46px; height: 46px;">
+              <i class="bi bi-envelope-at fs-5"></i>
+            </div>
+            <div>
+              <div class="small text-muted">Email Support</div>
+              <div class="fw-bold text-dark">support@jobportal.pro</div>
+              <div class="text-muted" style="font-size: 0.75rem;">Average response time: &lt; 2 hours</div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
+            <div class="rounded-3 bg-success-subtle text-success p-3 d-inline-flex align-items-center justify-content-center" style="width: 46px; height: 46px;">
+              <i class="bi bi-telephone fs-5"></i>
+            </div>
+            <div>
+              <div class="small text-muted">Enterprise & Hiring Sales</div>
+              <div class="fw-bold text-dark">+1 (800) 555-JOBS</div>
+              <div class="text-muted" style="font-size: 0.75rem;">Mon - Fri, 9am - 6pm EST</div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3">
+            <div class="rounded-3 bg-info-subtle text-info p-3 d-inline-flex align-items-center justify-content-center" style="width: 46px; height: 46px;">
+              <i class="bi bi-geo-alt fs-5"></i>
+            </div>
+            <div>
+              <div class="small text-muted">Global Headquarters</div>
+              <div class="fw-bold text-dark">500 Howard Street, Suite 400</div>
+              <div class="text-muted" style="font-size: 0.75rem;">San Francisco, CA 94105</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="jp-card p-4 bg-light border-0">
+          <h6 class="fw-bold text-dark mb-2"><i class="bi bi-question-circle text-primary me-1"></i> Looking for instant answers?</h6>
+          <p class="small text-muted mb-3">
+            Browse our comprehensive FAQ center covering application tracking, resume management, employer moderation policies, and profile settings.
+          </p>
+          <a href="{% url 'faq' %}" class="btn btn-outline-primary btn-sm">
+            Visit Help & FAQ Center <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
