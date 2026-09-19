@@ -11,16 +11,13 @@ SECRET_KEY = config(
     "SECRET_KEY", default="django-insecure-local-dev-key-72819830491823"
 )
 DEBUG = config("DEBUG", default=True, cast=bool)
-ALLOWED_HOSTS = config(
-    "ALLOWED_HOSTS",
-    default="localhost,127.0.0.1,testserver,.vercel.app,.now.sh,.onrender.com,.railway.app",
-    cast=Csv(),
-)
-CSRF_TRUSTED_ORIGINS = config(
-    "CSRF_TRUSTED_ORIGINS",
-    default="http://localhost:8000,http://127.0.0.1:8000,https://*.vercel.app",
-    cast=Csv(),
-)
+ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.vercel.app",
+    "https://*.now.sh",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
 
 
 INSTALLED_APPS = [
