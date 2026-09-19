@@ -74,6 +74,8 @@ DATABASE_URL = (
     config("DATABASE_URL", default=None)
     or config("POSTGRES_URL", default=None)
     or config("POSTGRES_PRISMA_URL", default=None)
+    or config("STORAGE_URL", default=None)
+    or config("POSTGRES_URL_NON_POOLING", default=None)
 )
 USE_POSTGRES = config("USE_POSTGRES", default=False, cast=bool)
 
